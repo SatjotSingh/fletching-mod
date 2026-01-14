@@ -3,7 +3,7 @@
 	"package": "net.daplow.daplowfletch.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"ExampleMixin"
+		"FletchingTableMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -1,0 +1,35 @@
+package net.daplow.daplowfletch.entity;
+
+import net.daplow.daplowfletch.DaplowFletch;
+import net.daplow.daplowfletch.item.custom.OpArrowItemEntity;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnGroup;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+
+public class ModEntities {
+
+    // The OpArrow entity type
+    public static final EntityType<OpArrowItemEntity> OP_ARROW_ENTITY =
+            Registry.register(
+                    Registry.ENTITY_TYPE,
+                    new Identifier(DaplowFletch.MOD_ID, "op_arrow"),
+                    FabricEntityTypeBuilder
+                            .<OpArrowItemEntity>create(SpawnGroup.MISC, OpArrowItemEntity::new)
+                            .dimensions(EntityDimensions.fixed(0.5F, 0.5F)) // size of arrow
+                            .trackRangeBlocks(64) // client tracking range
+                            .trackedUpdateRate(10) // update rate
+                            .build()
+
+            );
+
+
+    // Call this from your main class onInitialize
+    public static void register() {
+        // Registration is done statically above
+        // Optional: add logging here
+        System.out.println("Registered Mod Entities!");
+    }
+}

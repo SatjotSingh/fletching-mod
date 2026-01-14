@@ -26,7 +26,7 @@
 		"daplow-fletch.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.18.4",
+		"fabricloader": "0.18.3",
 		"minecraft": "~1.19.2",
 		"java": ">=17",
 		"fabric-api": "*"

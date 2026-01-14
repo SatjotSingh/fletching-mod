@@ -1,5 +1,10 @@
 package net.daplow.daplowfletch;
 
+import net.daplow.daplowfletch.block.ModBlockEntities;
+import net.daplow.daplowfletch.block.ModBlocks;
+import net.daplow.daplowfletch.entity.ModEntities;
+import net.daplow.daplowfletch.item.ModItems;
+import net.daplow.daplowfletch.screen.ModScreenHandler;
 import net.fabricmc.api.ModInitializer;
 
 import org.slf4j.Logger;
@@ -19,6 +24,13 @@ public class DaplowFletch implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
-		LOGGER.info("Hello Fabric world!");
+		LOGGER.info("WAKE UP DAPLOW!!!");
+		ModItems.registerItems();
+		ModEntities.register();
+
+		ModBlockEntities.register();
+		ModScreenHandler.register();
+
+
 	}
 }
