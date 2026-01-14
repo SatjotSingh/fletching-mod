@@ -40,11 +40,6 @@ public abstract class FletchingTableMixin {
             return;
         }
 
-        BlockEntity be = world.getBlockEntity(pos);
-        if (!(be instanceof FletchingTableBlockEntity fletchingBE)) {
-            cir.setReturnValue(ActionResult.PASS);
-            return;
-        }
 
         player.openHandledScreen(new SimpleNamedScreenHandlerFactory(
                 (syncId, inv, playerEntity) ->
