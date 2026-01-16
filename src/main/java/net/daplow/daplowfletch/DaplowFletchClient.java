@@ -6,6 +6,7 @@ import net.daplow.daplowfletch.screen.FletchingScreenHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.daplow.daplowfletch.screen.FletchingScreen;
 import net.daplow.daplowfletch.screen.ModScreenHandler;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
@@ -21,6 +22,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
 
 public class DaplowFletchClient implements ClientModInitializer {
     @Override

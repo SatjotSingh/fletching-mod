@@ -26,6 +26,8 @@ public class DaplowFletch implements ModInitializer {
 
 		LOGGER.info("WAKE UP DAPLOW!!!");
 		ModItems.registerItems();
+
+
 		ModEntities.register();
 
 		ModBlockEntities.register();

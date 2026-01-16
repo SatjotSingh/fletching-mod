@@ -20,7 +20,6 @@ public class FletchingScreen extends HandledScreen<FletchingScreenHandler> {
         super(handler, inventory, title);
         this.backgroundWidth = 176;
         this.backgroundHeight = 166;
-        System.out.println("FletchingScreen code happened");
     }
 
 
@@ -28,13 +27,11 @@ public class FletchingScreen extends HandledScreen<FletchingScreenHandler> {
     protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         this.client.getTextureManager().bindTexture(TEXTURE);
 
-        System.out.println("Background was drawn");
         RenderSystem.setShaderTexture(0, TEXTURE);
         DrawableHelper.drawTexture(matrices, this.x, this.y, 0, 0, backgroundWidth, backgroundHeight, 256, 256);
 
         // Draw potion saver if a potion is stored
         int height = handler.getPotionAmount();
-
         int color = handler.getPotionColor();
 
         float r = ((color >> 16) & 0xFF) / 255.0F;

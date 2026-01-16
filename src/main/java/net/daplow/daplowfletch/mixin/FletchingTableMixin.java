@@ -1,7 +1,12 @@
 package net.daplow.daplowfletch.mixin;
 
+import io.netty.buffer.Unpooled;
 import net.daplow.daplowfletch.block.FletchingTableBlockEntity;
+import net.daplow.daplowfletch.data.FletchingPotionData;
+import net.daplow.daplowfletch.data.FletchingTableWorldData;
+import net.daplow.daplowfletch.network.ModPackets;
 import net.daplow.daplowfletch.screen.FletchingScreenHandler;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FletchingTableBlock;
@@ -15,6 +20,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -30,26 +36,45 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(FletchingTableBlock.class)
 public abstract class FletchingTableMixin {
 
-    @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
-    private void openCustomGui(BlockState state, World world, BlockPos pos,
-                               PlayerEntity player, Hand hand, BlockHitResult hit,
-                               CallbackInfoReturnable<ActionResult> cir) {
+    @Inject(method = "onUse", at = @At("RETURN"), cancellable = true)
+    private void onUseMixin(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
+        if (!world.isClient && player instanceof ServerPlayerEntity serverPlayer) {
+            serverPlayer.openHandledScreen(new ExtendedScreenHandlerFactory() {
+                @Override
+                public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+                    buf.writeBlockPos(pos);
 
-        if (world.isClient) {
-            cir.setReturnValue(ActionResult.SUCCESS);
-            return;
+                    // Send the potion values to the client
+                    FletchingTableWorldData worldData = FletchingTableWorldData.get((ServerWorld) player.getWorld());
+                    FletchingPotionData data = worldData.getOrCreate(pos);
+
+                    buf.writeInt(data.getPotionLeft());
+                    buf.writeInt(data.getPotionColor());
+
+                }
+
+                @Override
+                public Text getDisplayName() {
+                    return Text.translatable(" ");
+                }
+
+                @Override
+                public FletchingScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity playerEntity) {
+                    System.out.println("Yo generated");
+
+                    FletchingScreenHandler handler = new FletchingScreenHandler(syncId, inv, pos);
+
+                    if (playerEntity.getWorld().isClient) {
+                        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer()); // Actually Minecraft does this automatically
+                        handler.ClientColor = buf.readInt();
+                        handler.ClientHeight = buf.readInt();
+                    }
+                    handler.loadPotionDataServer();
+
+                    return handler;
+
+                }
+            });
         }
-
-
-        player.openHandledScreen(new SimpleNamedScreenHandlerFactory(
-                (syncId, inv, playerEntity) ->
-                        new FletchingScreenHandler(
-                                syncId,
-                                inv,
-                                ScreenHandlerContext.create(world, pos)
-                        ),
-                Text.translatable("container.fletching")
-        ));
-        cir.setReturnValue(ActionResult.CONSUME);
     }
 }
