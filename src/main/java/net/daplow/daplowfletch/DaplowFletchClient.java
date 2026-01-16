@@ -23,6 +23,8 @@ import net.minecraft.potion.PotionUtil;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import static net.daplow.daplowfletch.network.ModPackets.*;
+
 
 public class DaplowFletchClient implements ClientModInitializer {
     @Override
@@ -32,6 +34,19 @@ public class DaplowFletchClient implements ClientModInitializer {
                 (FletchingScreenHandler handler, PlayerInventory inv, Text title) ->
                         new FletchingScreen(handler, inv, title)
         );
+
+        ClientPlayNetworking.registerGlobalReceiver(POTION_INFO, (client, handler, buf, responseSender) -> {
+            int height = buf.readInt();
+            int color = buf.readInt();
+            client.execute(() -> {
+                if (client.currentScreen instanceof FletchingScreen screen) {
+                    screen.ClientHeight = height; // update client-side variable
+                    screen.ClientColor = color; // update client-side variable
+                }
+            });
+        });
+
+
 
 
         ModelPredicateProviderRegistry.register(

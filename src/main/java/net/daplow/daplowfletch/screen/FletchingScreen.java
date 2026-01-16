@@ -4,14 +4,15 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class FletchingScreen extends HandledScreen<FletchingScreenHandler> {
+
+
+    public int ClientHeight = 2;
+    public int ClientColor = 5000;
 
     private static final Identifier TEXTURE =
             new Identifier("daplow-fletch", "textures/gui/custom_fletching.png");
@@ -31,8 +32,10 @@ public class FletchingScreen extends HandledScreen<FletchingScreenHandler> {
         DrawableHelper.drawTexture(matrices, this.x, this.y, 0, 0, backgroundWidth, backgroundHeight, 256, 256);
 
         // Draw potion saver if a potion is stored
-        int height = handler.getPotionAmount();
-        int color = handler.getPotionColor();
+        int height = ClientHeight;
+        int color = ClientColor;
+
+        //System.out.println("Height:" + height + ", Color: " + color);
 
         float r = ((color >> 16) & 0xFF) / 255.0F;
         float g = ((color >> 8) & 0xFF) / 255.0F;
@@ -83,7 +86,6 @@ public class FletchingScreen extends HandledScreen<FletchingScreenHandler> {
 
 
     }
-
 
 
 

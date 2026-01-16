@@ -44,12 +44,6 @@ public abstract class FletchingTableMixin {
                 public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
                     buf.writeBlockPos(pos);
 
-                    // Send the potion values to the client
-                    FletchingTableWorldData worldData = FletchingTableWorldData.get((ServerWorld) player.getWorld());
-                    FletchingPotionData data = worldData.getOrCreate(pos);
-
-                    buf.writeInt(data.getPotionLeft());
-                    buf.writeInt(data.getPotionColor());
 
                 }
 
@@ -64,13 +58,9 @@ public abstract class FletchingTableMixin {
 
                     FletchingScreenHandler handler = new FletchingScreenHandler(syncId, inv, pos);
 
-                    if (playerEntity.getWorld().isClient) {
-                        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer()); // Actually Minecraft does this automatically
-                        handler.ClientColor = buf.readInt();
-                        handler.ClientHeight = buf.readInt();
-                    }
-                    handler.loadPotionDataServer();
 
+                    handler.loadPotionDataServer();
+                    handler.syncToClient();
                     return handler;
 
                 }

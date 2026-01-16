@@ -30,7 +30,7 @@ public class FletchingTableWorldData extends PersistentState {
             entryTag.putInt("z", pos.getZ());
             entryTag.putString("potionID", data.getPotionID());
             entryTag.putInt("potionLeft", data.getPotionLeft());
-            entryTag.putInt("potionColor", data.getPotionLeft());
+            entryTag.putInt("potionColor", data.getPotionColor());
 
             list.add(entryTag);
         }

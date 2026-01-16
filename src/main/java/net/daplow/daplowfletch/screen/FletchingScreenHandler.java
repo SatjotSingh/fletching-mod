@@ -5,6 +5,7 @@ import net.daplow.daplowfletch.block.FletchingTableBlockEntity;
 import net.daplow.daplowfletch.data.FletchingPotionData;
 import net.daplow.daplowfletch.data.FletchingTableWorldData;
 import net.daplow.daplowfletch.item.ModItems;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,7 +28,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.core.jmx.Server;
 
-import static net.daplow.daplowfletch.network.ModPackets.SYNC_POTION;
+import static net.daplow.daplowfletch.network.ModPackets.*;
 
 public class FletchingScreenHandler extends ScreenHandler {
 
@@ -46,15 +47,11 @@ public class FletchingScreenHandler extends ScreenHandler {
     private String PotionID = "minecraft.water";
 
 
-
     public FletchingScreenHandler(int syncId, PlayerInventory playerInventory, BlockPos tablePos) {
         super(ModScreenHandler.CUSTOM_FLETCHING, syncId);
         this.playerInventory = playerInventory;
         this.tablePos = tablePos;
 // After creating handler on server
-
-// Load potion data from world
-
 
         /*
         if (!playerInventory.player.getWorld().isClient()) {
@@ -131,8 +128,15 @@ public class FletchingScreenHandler extends ScreenHandler {
         this.ClientColor = PotionData.getPotionColor();
         this.ClientHeight = PotionData.getPotionLeft();
 
+
+
         System.out.println("Potion Loaded: " + PotionLeft + ", " + PotionColor + ", " + PotionID);
+
     }
+
+
+
+
 
     private void addPlayerInventory(PlayerInventory inventory) {
         int startX = 8;
@@ -327,9 +331,38 @@ public class FletchingScreenHandler extends ScreenHandler {
 
         this.ClientColor = PotionData.getPotionColor();
         this.ClientHeight = PotionData.getPotionLeft();
-        // Tell Minecraft to save this PersistentState
+
+        syncToClient();
+
         FletchingTableWorldData.get(world).markDirtyForSave();
 
         System.out.println("Saved Potion Info Succefully");
+    }
+    public void syncToClient() {
+
+        System.out.println("Synce Started 1");
+        if (playerInventory.player.getWorld().isClient) return; // client does nothing
+        System.out.println("Synce Started 2");
+        // Ensure the player is a server player
+        if (!(playerInventory.player instanceof ServerPlayerEntity serverPlayer)) return;
+        System.out.println(ClientColor + ", " + ClientHeight);
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeInt(ClientHeight);
+        buf.writeInt(ClientColor);
+
+        ServerPlayNetworking.send(serverPlayer, POTION_INFO, buf);
+        System.out.println("Synce Started 4");
+    }
+
+    @Override
+    public void sendContentUpdates() {
+        super.sendContentUpdates();
+
+        if (playerInventory.player instanceof ServerPlayerEntity serverPlayer) {
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeInt(ClientHeight);
+            buf.writeInt(ClientColor);
+            ServerPlayNetworking.send(serverPlayer, POTION_INFO, buf);
+        }
     }
 }
