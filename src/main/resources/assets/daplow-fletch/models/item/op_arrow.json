@@ -1,19 +1,6 @@
 {
   "parent": "item/generated",
-
-  "overrides": [
-
-    {
-      "predicate": { "daplowfletch:stem": 1 },
-      "model": "daplow-fletch:item/op_arrow_stem"
-    },
-    {
-      "predicate": { "daplowfletch:potion": 1 },
-      "model": "daplow-fletch:item/op_arrow_potion"
-    },
-    {
-      "predicate": { "daplowfletch:potion_stem": 1},
-      "model": "daplow-fletch:item/op_arrow_potion_stem"
-    }
-  ]
+  "textures": {
+    "layer0": "minecraft:item/arrow"
+  }
 }

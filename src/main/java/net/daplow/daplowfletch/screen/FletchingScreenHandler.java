@@ -12,70 +12,46 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.PotionItem;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.potion.PotionUtil;
-import net.minecraft.screen.ArrayPropertyDelegate;
-import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
-import org.apache.logging.log4j.core.jmx.Server;
 
 import static net.daplow.daplowfletch.network.ModPackets.*;
 
 public class FletchingScreenHandler extends ScreenHandler {
 
     private final PlayerInventory playerInventory;
-    private final SimpleInventory fletchingInventory; // 4 inputs + 1 output
+    private final SimpleInventory fletchingInventory;
     private String storedPotion = null;
-
     private FletchingPotionData PotionData;
     private final BlockPos tablePos;
 
     public int ClientColor = 0xFF385DC6;
-    public int ClientHeight = 5;
+    public int ClientHeight = 0;
 
-    private int PotionLeft = 5;
+    private int PotionLeft = 0;
     private int PotionColor = 0xFF385DC6;
     private String PotionID = "minecraft.water";
+
+    //private  boolean ShiftClick = false;
+    //private ItemStack previousitem = ItemStack.EMPTY;
+    //private ItemStack nextitem = ItemStack.EMPTY;
+    //private int ShiftClickedCount = 0;
 
 
     public FletchingScreenHandler(int syncId, PlayerInventory playerInventory, BlockPos tablePos) {
         super(ModScreenHandler.CUSTOM_FLETCHING, syncId);
         this.playerInventory = playerInventory;
         this.tablePos = tablePos;
-// After creating handler on server
-
-        /*
-        if (!playerInventory.player.getWorld().isClient()) {
-            ServerWorld world = (ServerWorld) playerInventory.player.getWorld();
-            FletchingTableWorldData worldData = FletchingTableWorldData.get(world);
-
-            // Use getOrCreate so we never get null
-            PotionData = FletchingTableWorldData.get(world).getOrCreate(tablePos);
-
-
-            // Copy values to your handler fields
-            PotionLeft = this.PotionData.getPotionLeft();
-            PotionColor = this.PotionData.getPotionColor();
-            PotionID = this.PotionData.getPotionID();
-            System.out.println("Potion Saved");
-            System.out.print(PotionLeft);
-            System.out.print(PotionColor);
-            System.out.print(PotionID);
-
-            worldData.markDirtyForSave();
-        } else {
-            System.out.println("Yo we got client doing somthing");
-        }
-*/
 
         // Safe inventory: markDirty only triggers onContentChanged
         this.fletchingInventory = new SimpleInventory(5) {
@@ -87,7 +63,18 @@ public class FletchingScreenHandler extends ScreenHandler {
         };
 
         // Input slots
-        this.addSlot(new Slot(fletchingInventory, 0, 26, 43)); // arrow
+        this.addSlot(new Slot(fletchingInventory, 0, 26, 43) {// arrow
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return stack.getItem() == Items.ARROW;
+            }
+
+            @Override
+            public int getMaxItemCount() {
+                return 64; // or whatever max you want
+            }
+        });
+
         this.addSlot(new Slot(fletchingInventory, 1, 54, 24) { // potion
             @Override
             public boolean canInsert(ItemStack stack) {
@@ -99,7 +86,12 @@ public class FletchingScreenHandler extends ScreenHandler {
                 return 1; // Only store one potion
             }
         });
-        this.addSlot(new Slot(fletchingInventory, 2, 80, 43));
+        this.addSlot(new Slot(fletchingInventory, 2, 80, 43) {
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return stack.isOf(Items.GOLD_NUGGET) || stack.isOf(Items.IRON_NUGGET);
+            }
+        });
         this.addSlot(new Slot(fletchingInventory, 3, 80, 62));
 
         // Output slot (read-only)
@@ -107,6 +99,36 @@ public class FletchingScreenHandler extends ScreenHandler {
             @Override
             public boolean canInsert(ItemStack stack) {
                 return false;
+            }
+            @Override
+            public void onTakeItem(PlayerEntity player, ItemStack stack) {
+                super.onTakeItem(player, stack);
+
+                ItemStack item = fletchingInventory.getStack(4);
+                /*
+                if (ShiftClick) {
+                    ShiftClickedCount++;
+
+                    System.out.println("SHIFT CLICKED " + ShiftClickedCount + " times.");
+                } else {
+                    ShiftClickedCount = 0;
+                    System.out.println("NO SHIFT CLICK");
+                }*/
+                // Consume inputs
+                fletchingInventory.removeStack(0, 1); // arrow
+                fletchingInventory.removeStack(2, 1); // nugget
+                fletchingInventory.removeStack(3, 1); // feather
+
+                // Potion logic
+                if (PotionLeft > 0) {
+                    PotionLeft--;
+                }
+
+
+                savePotionData(); // sync + persist
+                //previousitem = fletchingInventory.getStack(4);
+                onContentChanged(fletchingInventory); // recalc output
+
             }
         });
 
@@ -130,7 +152,6 @@ public class FletchingScreenHandler extends ScreenHandler {
 
 
 
-        System.out.println("Potion Loaded: " + PotionLeft + ", " + PotionColor + ", " + PotionID);
 
     }
 
@@ -180,29 +201,30 @@ public class FletchingScreenHandler extends ScreenHandler {
         boolean Potion_Hanji = false;
         boolean Stem_Hanji = false;
         boolean Other_Hanji = false;
-
-        System.out.println("Potion Checked: " + PotionLeft + ", " + PotionColor + ", " + PotionID);
-        System.out.println("Potion Truth: " + PotionData.getPotionLeft() + ", " +PotionData.getPotionColor()  + ", " + PotionData.getPotionID() );
         PotionLeft = PotionData.getPotionLeft();
 
-
+        //if (!ShiftClick) {
+        //    ShiftClickedCount = 0;
+        //}
         // Get Potion
         if (!potionSlot.isEmpty() && potionSlot.getItem() instanceof PotionItem && storedPotion == null) {
 
-            if (potionSlot.hasNbt() && potionSlot.getNbt().contains("Potion")) {
-                PotionID = potionSlot.getNbt().getString("Potion");
-            } else {
-                // Some potion items (like Night Vision) might not have NBT until created
-                // Get the potion id from PotionUtil
-                PotionID = PotionUtil.getPotion(potionSlot).getClass().toString();
+            if (PotionLeft == 0) {
+                if (potionSlot.hasNbt() && potionSlot.getNbt().contains("Potion")) {
+                    PotionID = potionSlot.getNbt().getString("Potion");
+                } else {
+                    // Some potion items (like Night Vision) might not have NBT until created
+                    // Get the potion id from PotionUtil
+                    PotionID = PotionUtil.getPotion(potionSlot).getClass().toString();
+                }
+
+                PotionLeft = 8;
+                PotionColor = PotionUtil.getColor(potionSlot);
+
+                // Consume potion
+                potionSlot.decrement(1);
+                fletchingInventory.setStack(1, Items.GLASS_BOTTLE.getDefaultStack());
             }
-
-            PotionLeft = 8;
-            PotionColor = PotionUtil.getColor(potionSlot);
-
-            // Consume potion
-            potionSlot.decrement(1);
-
 
         }
 
@@ -270,13 +292,78 @@ public class FletchingScreenHandler extends ScreenHandler {
         if (!Potion_Hanji & !Stem_Hanji & !Other_Hanji) {
             newOutput = ItemStack.EMPTY;
         }
+
+
+
+
+
         // Only update output if item or NBT changed
         if (!ItemStack.areEqual(current, newOutput) && !ItemStack.areNbtEqual(current, newOutput)) {
             fletchingInventory.setStack(4, newOutput);
 
         }
+
+
+
+
         savePotionData();
         updatingOutput = false; // done updating
+    }
+
+    @Override
+    public ItemStack transferSlot(PlayerEntity player, int index) {
+        ItemStack result = ItemStack.EMPTY;
+        Slot slot = this.slots.get(index);
+        //ShiftClick = true;
+
+        System.out.println("transferSlot HAPPENED");
+        if (slot != null && slot.hasStack()) {
+            ItemStack stack = slot.getStack();
+            result = stack.copy();
+
+            if (index >= 0 && index <= 3) {
+                if (!this.insertItem(stack, 5, 41, false)) { // 5 = player inventory start, 41 = end
+                    return ItemStack.EMPTY;
+                }
+                slot.onTakeItem(player, stack);
+            }
+            if (index == 4) {
+                if (!this.insertItem(stack, 5, 41, true)) { // 5 = player inventory start, 41 = end
+                    return ItemStack.EMPTY;
+                }
+                slot.onTakeItem(player, stack);
+            }
+
+            // If the clicked slot is in the player inventory
+            else if (index >= 5) {
+                // If arrow, try input slot 0
+                boolean moved = false;
+
+                if (stack.getItem() == Items.ARROW) {
+                    moved = this.insertItem(stack, 0, 1, false);
+                } else if (stack.getItem() instanceof PotionItem) {
+                    moved = this.insertItem(stack, 1, 2, false);
+                } else if (stack.getItem()==Items.IRON_NUGGET||stack.getItem()==Items.GOLD_NUGGET) {
+                    moved = this.insertItem(stack, 2, 3, false);
+                } else {
+                    moved = this.insertItem(stack, 3, 4, false);
+                }
+
+                // If nothing moved, just return
+                if (!moved) return ItemStack.EMPTY;
+            }
+            // Input slots → player inventory
+
+
+            if (stack.isEmpty()) {
+                slot.setStack(ItemStack.EMPTY);
+            } else {
+                slot.markDirty();
+            }
+        }
+        //ShiftClick = false;
+        return result;
+
     }
 
     // Returns leftover items to player when GUI closes
@@ -298,10 +385,6 @@ public class FletchingScreenHandler extends ScreenHandler {
         return true;
     }
 
-    @Override
-    public ItemStack transferSlot(PlayerEntity player, int index) {
-        return ItemStack.EMPTY; // disable shift-click for now
-    }
 
 
 
@@ -336,22 +419,17 @@ public class FletchingScreenHandler extends ScreenHandler {
 
         FletchingTableWorldData.get(world).markDirtyForSave();
 
-        System.out.println("Saved Potion Info Succefully");
     }
     public void syncToClient() {
 
-        System.out.println("Synce Started 1");
         if (playerInventory.player.getWorld().isClient) return; // client does nothing
-        System.out.println("Synce Started 2");
         // Ensure the player is a server player
         if (!(playerInventory.player instanceof ServerPlayerEntity serverPlayer)) return;
-        System.out.println(ClientColor + ", " + ClientHeight);
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeInt(ClientHeight);
         buf.writeInt(ClientColor);
 
         ServerPlayNetworking.send(serverPlayer, POTION_INFO, buf);
-        System.out.println("Synce Started 4");
     }
 
     @Override

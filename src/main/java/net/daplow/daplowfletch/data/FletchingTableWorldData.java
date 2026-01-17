@@ -78,4 +78,8 @@ public class FletchingTableWorldData extends PersistentState {
     public void markDirtyForSave() {
         this.markDirty();
     }
+
+    public void remove(BlockPos pos) {
+        tableData.remove(pos);
+    }
 }

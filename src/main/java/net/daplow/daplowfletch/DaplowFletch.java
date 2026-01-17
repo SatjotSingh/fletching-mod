@@ -2,14 +2,18 @@ package net.daplow.daplowfletch;
 
 import net.daplow.daplowfletch.block.ModBlockEntities;
 import net.daplow.daplowfletch.block.ModBlocks;
+import net.daplow.daplowfletch.data.FletchingBreakHandler;
 import net.daplow.daplowfletch.entity.ModEntities;
 import net.daplow.daplowfletch.item.ModItems;
+import net.daplow.daplowfletch.renderer.ModularArrowItemRenderer;
 import net.daplow.daplowfletch.screen.ModScreenHandler;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("deprecation")
 public class DaplowFletch implements ModInitializer {
 	public static final String MOD_ID = "daplow-fletch";
 
@@ -33,6 +37,11 @@ public class DaplowFletch implements ModInitializer {
 		ModBlockEntities.register();
 		ModScreenHandler.register();
 
+		FletchingBreakHandler.register();
 
+		BuiltinItemRendererRegistry.INSTANCE.register(
+				ModItems.OP_ARROW,
+				new ModularArrowItemRenderer()
+		);
 	}
 }

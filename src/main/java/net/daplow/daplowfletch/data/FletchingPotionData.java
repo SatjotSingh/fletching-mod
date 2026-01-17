@@ -1,6 +1,8 @@
 package net.daplow.daplowfletch.data;
 
 public class FletchingPotionData {
+
+    // Default values for Potion Values
     private String potionID = "minecraft:water";
     private int potionLeft = 0;
     private int potionColor = 0xFF385DC6;;

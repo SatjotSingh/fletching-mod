@@ -1,17 +1,27 @@
 package net.daplow.daplowfletch.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Matrix4f;
 
 public class FletchingScreen extends HandledScreen<FletchingScreenHandler> {
 
 
-    public int ClientHeight = 2;
+    public int ClientHeight = 0;
     public int ClientColor = 5000;
 
     private static final Identifier TEXTURE =
@@ -53,8 +63,9 @@ public class FletchingScreen extends HandledScreen<FletchingScreenHandler> {
                 18,
                 height
         );
-    }
 
+
+    }
 
 
 
