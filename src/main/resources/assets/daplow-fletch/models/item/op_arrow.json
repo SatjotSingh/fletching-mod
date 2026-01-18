@@ -1,6 +1,9 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "minecraft:item/arrow"
+    "layer0": "daplow-fletch:item/op_arrow",
+    "layer1": "${ADDON1}",
+    "layer2": "${ADDON2}",
+    "layer3": "${ADDON3}"
   }
 }

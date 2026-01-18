@@ -1,0 +1,16 @@
+{
+  "sources": [
+    {
+      "type": "single",
+      "resource": "daplow-fletch:item/tipped_arrow_head"
+    },
+    {
+      "type": "single",
+      "resource": "daplow-fletch:item/op_arrow_stem"
+    },
+    {
+      "type": "single",
+      "resource": "daplow-fletch:item/op_arrow_addon_tnt"
+    }
+  ]
+}

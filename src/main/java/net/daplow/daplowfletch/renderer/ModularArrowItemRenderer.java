@@ -6,83 +6,60 @@ import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 
-@Environment(EnvType.CLIENT)
 @SuppressWarnings("deprecation")
+@Environment(EnvType.CLIENT)
 public class ModularArrowItemRenderer implements BuiltinItemRenderer {
 
     private static final MinecraftClient MC = MinecraftClient.getInstance();
 
     @Override
-    public void render(
-            ItemStack stack,
-            MatrixStack matrices,
-            VertexConsumerProvider vertexConsumers,
-            int light,
-            int overlay
-    ) {
-        ItemRenderer itemRenderer = MC.getItemRenderer();
+    public void render(ItemStack stack, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         matrices.push();
 
-        // Stem
+        ItemRenderer itemRenderer = MC.getItemRenderer();
+
+        // -----------------------
+        // 1️⃣ World / Hand mode
+        // -----------------------
+        ModelTransformation.Mode mode = ModelTransformation.Mode.FIXED;
+
+        // Base arrow
+        renderLayer(stack, "daplow-fletch:item/op_arrow_stem", matrices, vertexConsumers, light, overlay, mode);
+
+        // Stem layer
         if (stack.getOrCreateNbt().getBoolean("stem")) {
-            renderLayer(itemRenderer, "op_arrow_stem", matrices, vertexConsumers, light, overlay);
+            renderLayer(stack, "daplow-fletch:item/op_arrow_stem", matrices, vertexConsumers, light, overlay, mode);
         }
 
-        // Tip/Potion
+        // Tip layer
         if (stack.getOrCreateNbt().getBoolean("potion")) {
-            renderLayer(itemRenderer, "op_arrow_potion", matrices, vertexConsumers, light, overlay);
+            renderLayer(stack, "daplow-fletch:item/arrow_tip_potion", matrices, vertexConsumers, light, overlay, mode);
         }
 
-        // Payload
+        // Payload / addon layer
         String payload = stack.getOrCreateNbt().getString("HasAddon");
         if (!payload.isEmpty()) {
-            renderLayer(itemRenderer, "op_arrow_addon_" + payload, matrices, vertexConsumers, light, overlay);
+            renderLayer(stack, "daplow-fletch:item/arrow_tip_stem", matrices, vertexConsumers, light, overlay, mode);
         }
 
         matrices.pop();
     }
-
-    private void renderLayer(
-            ItemRenderer itemRenderer,
-            String modelName,
-            MatrixStack matrices,
-            VertexConsumerProvider vertexConsumers,
-            int light,
-            int overlay
-    ) {
-        // Create a dummy ItemStack using CustomModelData to point to the model JSON
-        ItemStack temp = new ItemStack(Items.STICK);
-        temp.getOrCreateNbt().putInt("CustomModelData", getCustomModelData(modelName));
-
-        // Render the model
-        itemRenderer.renderItem(
-                temp,                        // ItemStack
-                ModelTransformation.Mode.GUI,// Transformation type
-                light,                       // int light
-                overlay,                     // int overlay
-                matrices,                     // MatrixStack
-                vertexConsumers,              // VertexConsumerProvider
-                0                             // seed (can just pass 0)
-        );
+    private void renderOverlay(ItemStack stack, String textureId, MatrixStack matrices,
+                               VertexConsumerProvider vertexConsumers, int light, int overlay,
+                               ModelTransformation.Mode mode) {
+        var model = MC.getBakedModelManager().getModel((ModelIdentifier) new Identifier(textureId));
+        MC.getItemRenderer().renderItem(stack, mode, false, matrices, vertexConsumers, light, overlay, model);
     }
-
-    private int getCustomModelData(String modelName) {
-        // Map model name to the integer you set in your JSON overrides
-        // Example: in your resource pack, overrides look like:
-        // "predicate": { "custom_model_data": 1 }, "model": "daplow-fletch:item/op_arrow_stem"
-        return switch (modelName) {
-            case "op_arrow_stem" -> 1;
-            case "op_arrow_potion" -> 2;
-            case "op_arrow_addon_tnt" -> 3;
-            default -> 0;
-        };
+    private void renderLayer(ItemStack stack, String textureId,
+                             MatrixStack matrices, VertexConsumerProvider vertexConsumers,
+                             int light, int overlay, ModelTransformation.Mode mode) {
+        var model = MC.getBakedModelManager().getModel((ModelIdentifier) new Identifier(textureId));
+        MC.getItemRenderer().renderItem(stack, mode, false, matrices, vertexConsumers, light, overlay, model);
     }
 }

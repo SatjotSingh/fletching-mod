@@ -31,5 +31,8 @@ public class ModEntities {
         // Registration is done statically above
         // Optional: add logging here
         System.out.println("Registered Mod Entities!");
+
+
+
     }
 }

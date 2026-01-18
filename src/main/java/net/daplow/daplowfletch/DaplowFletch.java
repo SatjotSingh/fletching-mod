@@ -13,7 +13,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("deprecation")
+
 public class DaplowFletch implements ModInitializer {
 	public static final String MOD_ID = "daplow-fletch";
 
@@ -39,9 +39,6 @@ public class DaplowFletch implements ModInitializer {
 
 		FletchingBreakHandler.register();
 
-		BuiltinItemRendererRegistry.INSTANCE.register(
-				ModItems.OP_ARROW,
-				new ModularArrowItemRenderer()
-		);
+
 	}
 }

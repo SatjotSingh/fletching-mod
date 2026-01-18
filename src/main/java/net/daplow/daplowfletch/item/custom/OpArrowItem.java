@@ -7,14 +7,19 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ArrowItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public class OpArrowItem extends ArrowItem {
 
-    public OpArrowItem(Settings settings) {
+
+    public OpArrowItem(Settings settings, int a1, int a2, int a3) {
         super(settings);
+
     }
 
     public ArrowEntity createArrow(World world, ItemStack stack, LivingEntity shooter) {

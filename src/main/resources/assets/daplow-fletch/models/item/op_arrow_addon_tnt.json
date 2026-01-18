@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "daplow-fletch:item/tnt_addon"
+    "layer0": "daplow-fletch:item/op_arrow_addon_tnt"
   }
 }

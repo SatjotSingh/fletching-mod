@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "minecraft:item/tipped_arrow_head"
+    "layer0": "daplow-fletch:item/tipped_arrow_head"
   }
 }
