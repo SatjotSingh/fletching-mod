@@ -1,7 +1,6 @@
 package net.daplow.daplowfletch.mixin;
 
 import io.netty.buffer.Unpooled;
-import net.daplow.daplowfletch.block.FletchingTableBlockEntity;
 import net.daplow.daplowfletch.data.FletchingPotionData;
 import net.daplow.daplowfletch.data.FletchingTableWorldData;
 import net.daplow.daplowfletch.network.ModPackets;

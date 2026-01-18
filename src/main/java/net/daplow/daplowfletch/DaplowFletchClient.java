@@ -1,12 +1,13 @@
 package net.daplow.daplowfletch;
 
+import net.daplow.daplowfletch.block.ModBlocks;
 import net.daplow.daplowfletch.entity.ModEntities;
 import net.daplow.daplowfletch.item.ModItems;
-import net.daplow.daplowfletch.renderer.ModularArrowItemRenderer;
 import net.daplow.daplowfletch.screen.FletchingScreenHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.daplow.daplowfletch.screen.FletchingScreen;
 import net.daplow.daplowfletch.screen.ModScreenHandler;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
@@ -18,6 +19,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.ArrowEntityRenderer;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRendererFactory;
@@ -37,6 +39,7 @@ public class DaplowFletchClient implements ClientModInitializer {
                 (FletchingScreenHandler handler, PlayerInventory inv, Text title) ->
                         new FletchingScreen(handler, inv, title)
         );
+        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.ARROW_POWER_BLOCK, RenderLayer.getTranslucent());
 
         ClientPlayNetworking.registerGlobalReceiver(POTION_INFO, (client, handler, buf, responseSender) -> {
             int height = buf.readInt();
@@ -53,14 +56,14 @@ public class DaplowFletchClient implements ClientModInitializer {
 
 
 
-/*
+
         ModelPredicateProviderRegistry.register(
-                ModItems.OP_ARROW,
+                ModItems.OP_ARROW[0],
                 new Identifier("daplowfletch", "stem"),
                 (stack, world, entity, seed) ->
                         stack.hasNbt() && stack.getNbt().contains("stem") ? 1.0F : 0.0F
         );
-        ModelPredicateProviderRegistry.register(ModItems.OP_ARROW,
+        ModelPredicateProviderRegistry.register(ModItems.OP_ARROW[0],
                 new Identifier("daplowfletch", "potion_stem"),
                 (stack, world, entity, seed) -> {
                     if (!stack.hasNbt()) return 0f;
@@ -68,15 +71,15 @@ public class DaplowFletchClient implements ClientModInitializer {
                     boolean hasStem = stack.getNbt().contains("stem_variant");
                     return (hasPotion && hasStem) ? 1f : 0f;
                 }
-        );*/
+        );
 
         ColorProviderRegistry.ITEM.register((stack, tintIndex) -> {
-            if (tintIndex == 1) { // potion layer
+            if (tintIndex == 3) { // potion layer
                 if (!stack.hasNbt() || !stack.getNbt().contains("Potion")) return 0xFFFFFF;
                 return PotionUtil.getColor(stack);
             }
 
-            if (tintIndex == 2) { // stem layer
+            if (tintIndex == 1) { // stem layer
                 if (!stack.hasNbt()) return 0xFFFFFF;
                 String stem = stack.getNbt().getString("stem_variant");
                 if ("gold".equals(stem)) return 0xFFD700;

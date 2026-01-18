@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "daplow-fletch:block/arrow_power_block" }
+  }
+}

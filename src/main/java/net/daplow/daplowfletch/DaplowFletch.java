@@ -1,11 +1,9 @@
 package net.daplow.daplowfletch;
 
-import net.daplow.daplowfletch.block.ModBlockEntities;
 import net.daplow.daplowfletch.block.ModBlocks;
 import net.daplow.daplowfletch.data.FletchingBreakHandler;
 import net.daplow.daplowfletch.entity.ModEntities;
 import net.daplow.daplowfletch.item.ModItems;
-import net.daplow.daplowfletch.renderer.ModularArrowItemRenderer;
 import net.daplow.daplowfletch.screen.ModScreenHandler;
 import net.fabricmc.api.ModInitializer;
 
@@ -31,10 +29,10 @@ public class DaplowFletch implements ModInitializer {
 		LOGGER.info("WAKE UP DAPLOW!!!");
 		ModItems.registerItems();
 
+		ModBlocks.registerModBlocks();
 
 		ModEntities.register();
 
-		ModBlockEntities.register();
 		ModScreenHandler.register();
 
 		FletchingBreakHandler.register();

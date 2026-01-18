@@ -11,40 +11,28 @@ import net.minecraft.util.registry.Registry;
 
 public class ModItems {
 
-    public static final Item OP_ARROW = new OpArrowItem(new Item.Settings().maxCount(64));
+    public static final Item[] OP_ARROW = new Item[40];
 
-    // Base arrow
-
-    // Stem (render-only, doesn’t need to exist in inventory if you want)
-    public static final Item OP_ARROW_STEM = new Item(new FabricItemSettings().group(ItemGroup.COMBAT));
-
-    // Tip (potion tip)
-    public static final Item OP_ARROW_TIP = new Item(new FabricItemSettings().group(ItemGroup.COMBAT));
-
-    // Addons: example for TNT, Diamond, etc.
-    public static final Item ADDON_TNT = new Item(new FabricItemSettings().group(ItemGroup.COMBAT));
-
-    // Optional helper to get an addon by string
-    public static Item getAddonItem(String payload) {
-        return switch(payload) {
-            case "tnt" -> ADDON_TNT;
-            default -> null; // or OP_ARROW as fallback
-        };
-    }
     public static void registerItems() {
-        Registry.register(Registry.ITEM, new Identifier(DaplowFletch.MOD_ID, "op_arrow"), OP_ARROW);
-        Registry.register(Registry.ITEM, new Identifier("daplow-fletch", "op_arrow_stem"), OP_ARROW_STEM);
-        Registry.register(Registry.ITEM, new Identifier("daplow-fletch", "op_arrow_potion"), OP_ARROW_TIP);
-        Registry.register(Registry.ITEM, new Identifier("daplow-fletch", "op_arrow_addon_tnt"), ADDON_TNT);
+        // First: create all OP_ARROW items
+        int index = 0;
+        for (int a1 = 0; a1 <= 1; a1++) {
+            for (int a2 = 0; a2 <= 1; a2++) {
+                for (int a3 = 0; a3 < 10; a3++) {
+
+                    OP_ARROW[index] = new OpArrowItem(new Item.Settings().maxCount(64), a1, a2, a3);
+                    index++;
+                }
+            }
+        }
+
+        // Now register all items safely
+        for (int i = 0; i < OP_ARROW.length; i++) {
+            Registry.register(Registry.ITEM, new Identifier("daplow-fletch", "op_arrow_" + i), OP_ARROW[i]);
+        }
 
 
-        ModelPredicateProviderRegistry.register(ModItems.OP_ARROW, new Identifier("stem"), (stack, world, entity, seed) ->
-                stack.getOrCreateNbt().getBoolean("stem") ? 1f : 0f
-        );
 
-        ModelPredicateProviderRegistry.register(ModItems.OP_ARROW, new Identifier("potion"), (stack, world, entity, seed) ->
-                stack.getOrCreateNbt().getBoolean("potion") ? 1f : 0f
-        );
 
     }
 }
