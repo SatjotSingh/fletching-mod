@@ -1,0 +1,9 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "daplow-fletch:item/arrow_base",
+    "layer3": "daplow-fletch:item/no_addon",
+    "layer1": "daplow-fletch:item/op_arrow_stem",
+    "layer2": "daplow-fletch:item/op_arrow_addon_9"
+  }
+}

@@ -11,7 +11,7 @@ import net.minecraft.util.registry.Registry;
 
 public class ModEntities {
 
-    // The OpArrow entity type
+    // For Shooting the arrow...  The shot arrow is a entity
     public static final EntityType<OpArrowItemEntity> OP_ARROW_ENTITY =
             Registry.register(
                     Registry.ENTITY_TYPE,
@@ -26,11 +26,8 @@ public class ModEntities {
             );
 
 
-    // Call this from your main class onInitialize
     public static void register() {
-        // Registration is done statically above
-        // Optional: add logging here
-        System.out.println("Registered Mod Entities!");
+        //System.out.println("Registered Mod Entities!");
 
 
 

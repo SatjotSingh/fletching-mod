@@ -1,11 +1,6 @@
 package net.daplow.daplowfletch.mixin;
 
-import io.netty.buffer.Unpooled;
-import net.daplow.daplowfletch.data.FletchingPotionData;
-import net.daplow.daplowfletch.data.FletchingTableWorldData;
-import net.daplow.daplowfletch.network.ModPackets;
 import net.daplow.daplowfletch.screen.FletchingScreenHandler;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FletchingTableBlock;
@@ -13,7 +8,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -23,7 +17,6 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 
@@ -47,7 +40,6 @@ public abstract class FletchingTableMixin {
                 }
 
 
-                // Remove name for custom name
                 @Override
                 public Text getDisplayName() {
                     return Text.translatable(" ");
@@ -58,9 +50,7 @@ public abstract class FletchingTableMixin {
 
                     FletchingScreenHandler handler = new FletchingScreenHandler(syncId, inv, pos);
 
-
                     handler.loadPotionDataServer();
-                    //handler.syncToClient();
                     return handler;
 
                 }

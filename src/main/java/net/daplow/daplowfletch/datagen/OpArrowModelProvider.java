@@ -1,6 +1,5 @@
 package net.daplow.daplowfletch.datagen;
 
-import net.daplow.daplowfletch.item.ModItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.minecraft.data.client.*;

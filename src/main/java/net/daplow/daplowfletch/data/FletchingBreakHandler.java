@@ -3,8 +3,6 @@ package net.daplow.daplowfletch.data;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.block.FletchingTableBlock;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.block.Block;
 
 public class FletchingBreakHandler {
 

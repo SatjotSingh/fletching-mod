@@ -24,7 +24,7 @@ public class ModBlocks {
                     .noCollision()
                     .breakInstantly()
                     .dropsNothing());
-    public static void registerModBlocks() {
+    public static void register() {
         DaplowFletch.LOGGER.debug("Registering Mod Block for " + DaplowFletch.MOD_ID);
         Registry.register(Registry.BLOCK, new Identifier("daplow-fletch", "arrow_power_block"), ARROW_POWER_BLOCK);
 

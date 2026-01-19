@@ -13,14 +13,14 @@ public class ModItems {
 
     public static final Item[] OP_ARROW = new Item[40];
 
-    public static void registerItems() {
+    public static void register() {
         // First: create all OP_ARROW items
         int index = 0;
         for (int a1 = 0; a1 <= 1; a1++) {
             for (int a2 = 0; a2 <= 1; a2++) {
                 for (int a3 = 0; a3 < 10; a3++) {
 
-                    OP_ARROW[index] = new OpArrowItem(new Item.Settings().maxCount(64), a1, a2, a3);
+                    OP_ARROW[index] = new OpArrowItem(new Item.Settings().maxCount(64).group(null), a1, a2, a3);
                     index++;
                 }
             }

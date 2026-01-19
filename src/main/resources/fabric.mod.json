@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "daplow-fletch",
 	"version": "${version}",
-	"name": "Daplow's Fletching Table Revamp",
+	"name": "Daplow's Fletching Table Mod",
 	"description": "Revamp Fletching Table to make it useful :)",
 	"authors": [
 		"Daplow"
@@ -26,7 +26,7 @@
 		"daplow-fletch.mixins.json"
 	],
 	"depends": {
-		"fabricloader": "0.18.3",
+		"fabricloader": "0.18.4",
 		"minecraft": "~1.19.2",
 		"java": ">=17",
 		"fabric-api": "*"

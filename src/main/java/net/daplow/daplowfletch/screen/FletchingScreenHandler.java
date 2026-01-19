@@ -1,18 +1,15 @@
 package net.daplow.daplowfletch.screen;
 
-import io.netty.buffer.Unpooled;
 import net.daplow.daplowfletch.data.FletchingPotionData;
 import net.daplow.daplowfletch.data.FletchingTableWorldData;
 import net.daplow.daplowfletch.item.ModItems;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.PotionItem;
@@ -50,18 +47,12 @@ public class FletchingScreenHandler extends ScreenHandler {
     private int PotionColor = 0xFF385DC6;
     private String PotionID = "minecraft.water";
 
-    //private  boolean ShiftClick = false;
-    //private ItemStack previousitem = ItemStack.EMPTY;
-    //private ItemStack nextitem = ItemStack.EMPTY;
-    //private int ShiftClickedCount = 0;
-
 
     public FletchingScreenHandler(int syncId, PlayerInventory playerInventory, BlockPos tablePos) {
         super(ModScreenHandler.CUSTOM_FLETCHING, syncId);
         this.playerInventory = playerInventory;
         this.tablePos = tablePos;
 
-        // Safe inventory: markDirty only triggers onContentChanged
         this.fletchingInventory = new SimpleInventory(5) {
             @Override
             public void markDirty() {
@@ -70,7 +61,6 @@ public class FletchingScreenHandler extends ScreenHandler {
             }
         };
 
-        // Input slots
         this.addSlot(new Slot(fletchingInventory, 0, 26, 43) {// arrow
             @Override
             public boolean canInsert(ItemStack stack) {
@@ -79,7 +69,7 @@ public class FletchingScreenHandler extends ScreenHandler {
 
             @Override
             public int getMaxItemCount() {
-                return 64; // or whatever max you want
+                return 64;
             }
         });
 
@@ -91,7 +81,7 @@ public class FletchingScreenHandler extends ScreenHandler {
 
             @Override
             public int getMaxItemCount() {
-                return 1; // Only store one potion
+                return 1; // max of 1 potion
             }
         });
         this.addSlot(new Slot(fletchingInventory, 2, 80, 43) {
@@ -113,36 +103,25 @@ public class FletchingScreenHandler extends ScreenHandler {
                 super.onTakeItem(player, stack);
 
                 ItemStack item = fletchingInventory.getStack(4);
-                /*
-                if (ShiftClick) {
-                    ShiftClickedCount++;
 
-                    System.out.println("SHIFT CLICKED " + ShiftClickedCount + " times.");
-                } else {
-                    ShiftClickedCount = 0;
-                    System.out.println("NO SHIFT CLICK");
-                }*/
-                // Consume inputs
                 fletchingInventory.removeStack(0, 1); // arrow
                 fletchingInventory.removeStack(2, 1); // nugget
                 fletchingInventory.removeStack(3, 1); // feather
 
-                // Potion logic
                 if (PotionLeft > 0) {
                     PotionLeft--;
                 }
 
 
-                savePotionData(); // sync + persist
-                //previousitem = fletchingInventory.getStack(4);
-                onContentChanged(fletchingInventory); // recalc output
+                savePotionData();
+                onContentChanged(fletchingInventory);
 
             }
         });
 
-        // Player inventory
         addPlayerInventory(playerInventory);
     }
+
 
     public void loadPotionDataServer() {
         if (playerInventory.player.getWorld().isClient) return; // skip client
@@ -157,14 +136,7 @@ public class FletchingScreenHandler extends ScreenHandler {
 
         this.ClientColor = PotionData.getPotionColor();
         this.ClientHeight = PotionData.getPotionLeft();
-
-
-
-
     }
-
-
-
 
 
     private void addPlayerInventory(PlayerInventory inventory) {
@@ -184,9 +156,6 @@ public class FletchingScreenHandler extends ScreenHandler {
         }
     }
 
-    public SimpleInventory getFletchingInventory() {
-        return fletchingInventory;
-    }
 
     private boolean updatingOutput = false;
 
@@ -194,11 +163,11 @@ public class FletchingScreenHandler extends ScreenHandler {
     public void onContentChanged(Inventory inventory) {
         super.onContentChanged(inventory);
 
-        if (updatingOutput) return; // Prevent recursion
+        if (updatingOutput) return;
         if (inventory != fletchingInventory) return;
         if (playerInventory.player.getWorld().isClient) return;
-        updatingOutput = true; // start updating
-        ItemStack current = fletchingInventory.getStack(4); // output
+        updatingOutput = true;
+        ItemStack current = fletchingInventory.getStack(4);
         ItemStack newOutput = ItemStack.EMPTY;
 
         ItemStack in0 = fletchingInventory.getStack(0);
@@ -226,74 +195,49 @@ public class FletchingScreenHandler extends ScreenHandler {
 
         List<String> all_potion_lore = new ArrayList<>();
 
-        //if (!ShiftClick) {
-        //    ShiftClickedCount = 0;
-        //}
-        // Get Potion
         if (!potionSlot.isEmpty() && potionSlot.getItem() instanceof PotionItem && storedPotion == null) {
 
             if (PotionLeft == 0) {
                 if (potionSlot.hasNbt() && potionSlot.getNbt().contains("Potion")) {
                     PotionID = potionSlot.getNbt().getString("Potion");
                 } else {
-                    // Some potion items (like Night Vision) might not have NBT until created
-                    // Get the potion id from PotionUtil
                     PotionID = PotionUtil.getPotion(potionSlot).getClass().toString();
                 }
 
                 PotionLeft = 8;
                 PotionColor = PotionUtil.getColor(potionSlot);
 
-                // Consume potion
                 potionSlot.decrement(1);
                 fletchingInventory.setStack(1, Items.GLASS_BOTTLE.getDefaultStack());
-
             }
-
         }
 
-        // Recipe logic: arrow + potion + gold nugget + feather
         if (in0.getItem() == Items.ARROW) {
             newOutput = new ItemStack(ModItems.OP_ARROW[0]);
-
-
-
-            //get Potion
             if (PotionLeft > 0) {
-                String potionId = "minecraft:water"; // default fallback
-
-
+                String potionId = "minecraft:water";
                 potionId = PotionID;
-
                 Potion_Hanji = true;
-                // Set the "Potion" tag as a STRING on the arrow
                 newOutput.getOrCreateNbt().putString("Potion", potionId);
                 newOutput.getOrCreateNbt().putBoolean("potion", true);
                 addon2 = 1;
-
 
                 ItemStack tempPotionStack = new ItemStack(Items.POTION);
 
                 Potion potion = Registry.POTION.get(new Identifier(potionId));
                 PotionUtil.setPotion(tempPotionStack, potion);
 
-                // ✅ This is the potion name (ex: "Potion of the Turtle Master")
                 string_potion =
                         " of " + tempPotionStack.getName().getString().replace("Potion of ", "");
 
-                ;
-                for (StatusEffectInstance effect : PotionUtil.getPotionEffects(tempPotionStack)) {
 
-                    // Effect name (localized)
+                for (StatusEffectInstance effect : PotionUtil.getPotionEffects(tempPotionStack)) {
                     potion_lore =
                             Text.translatable(effect.getEffectType().getTranslationKey()).getString();
-
                     int amplifier = effect.getAmplifier();
                     if (amplifier > 0) {
                         potion_lore += " " + toRoman(amplifier + 1);
                     }
-
-                    // Arrow-scaled duration
                     int potionTime = Math.max(effect.getDuration() / 8, 20);
                     int totalSeconds = potionTime / 20;
                     int minutes = totalSeconds / 60;
@@ -301,13 +245,12 @@ public class FletchingScreenHandler extends ScreenHandler {
 
                     potion_duration_lore =
                             String.format("%d:%02d", minutes, seconds);
-
-                    // Example final lore line:
-                    // "Resistance IV (0:22)"
-                    String finalLoreLine =
-                            potion_lore + " (" + potion_duration_lore + ")";
-
-                    // 👉 add finalLoreLine to your tooltip / lore list
+                    String finalLoreLine = "of Unknown Potion";
+                    if (effect.getEffectType().isInstant()) {
+                        finalLoreLine = potion_lore;
+                    } else {
+                        finalLoreLine = potion_lore + " (" + potion_duration_lore + ")";
+                    }
                     all_potion_lore.add(finalLoreLine);
                 }
 
@@ -315,27 +258,6 @@ public class FletchingScreenHandler extends ScreenHandler {
 
 
             }
-            /*
-            // in1 = the slot with potion
-            if (in1.getItem() instanceof PotionItem) {
-                String potionId = "minecraft:water"; // default fallback
-
-                // Check if in1 has Potion NBT
-                if (in1.hasNbt() && in1.getNbt().contains("Potion")) {
-                    potionId = in1.getNbt().getString("Potion");
-                } else {
-                    // Some potion items (like Night Vision) might not have NBT until created
-                    // Get the potion id from PotionUtil
-                    potionId = PotionUtil.getPotion(in1).getClass().toString();
-                }
-
-                Potion_Hanji = true;
-                // Set the "Potion" tag as a STRING on the arrow
-                newOutput.getOrCreateNbt().putString("Potion", potionId);
-                newOutput.getOrCreateNbt().putBoolean("potion", true);
-            }
-            */
-
 
             if (in2.getItem() == Items.GOLD_NUGGET) {
                 newOutput.getOrCreateNbt().putString("stem_variant", "gold");
@@ -368,14 +290,7 @@ public class FletchingScreenHandler extends ScreenHandler {
                 addon3 = 2;
                 string_feather = "Water ";
                 feather_lore = "Can be used in Water";
-            } /*else if (in3.getItem() == Items.REDSTONE) {
-                newOutput.getOrCreateNbt().putBoolean("hasFeatherLayer", true);
-                newOutput.getOrCreateNbt().putString("feather", "redstone");
-                Other_Hanji = true;
-                addon3 = 3;
-                string_feather = "Redstone ";
-                feather_lore = "Power Redstone dust if hit";
-            }*/
+            }
             else if (in3.getItem() == Items.FIRE_CHARGE) {
                 newOutput.getOrCreateNbt().putBoolean("hasFeatherLayer", true);
                 newOutput.getOrCreateNbt().putString("feather", "fire");
@@ -410,9 +325,6 @@ public class FletchingScreenHandler extends ScreenHandler {
             }
 
         }
-
-
-
 
 
         int index = addon1 * 20 + addon2 * 10 + addon3; // 0..39
@@ -450,17 +362,13 @@ public class FletchingScreenHandler extends ScreenHandler {
             result = ItemStack.EMPTY;
         }
 
-        // Only update output if item or NBT changed
         if (!ItemStack.areEqual(current, result) && !ItemStack.areNbtEqual(current, result)) {
             fletchingInventory.setStack(4, result);
 
         }
 
-
-
-
         savePotionData();
-        updatingOutput = false; // done updating
+        updatingOutput = false;
     }
 
     private static String toRoman(int number) {
@@ -481,9 +389,9 @@ public class FletchingScreenHandler extends ScreenHandler {
 
     @Override
     public ItemStack transferSlot(PlayerEntity player, int index) {
+        // For shift clicking
         ItemStack result = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
-        //ShiftClick = true;
 
         if (slot != null && slot.hasStack()) {
             ItemStack stack = slot.getStack();
@@ -502,9 +410,7 @@ public class FletchingScreenHandler extends ScreenHandler {
                 slot.onTakeItem(player, stack);
             }
 
-            // If the clicked slot is in the player inventory
             else if (index >= 5) {
-                // If arrow, try input slot 0
                 boolean moved = false;
 
                 if (stack.getItem() == Items.ARROW) {
@@ -517,11 +423,8 @@ public class FletchingScreenHandler extends ScreenHandler {
                     moved = this.insertItem(stack, 3, 4, false);
                 }
 
-                // If nothing moved, just return
                 if (!moved) return ItemStack.EMPTY;
             }
-            // Input slots → player inventory
-
 
             if (stack.isEmpty()) {
                 slot.setStack(ItemStack.EMPTY);
@@ -529,16 +432,14 @@ public class FletchingScreenHandler extends ScreenHandler {
                 slot.markDirty();
             }
         }
-        //ShiftClick = false;
         return result;
 
     }
 
-    // Returns leftover items to player when GUI closes
     @Override
     public void close(PlayerEntity player) {
         super.close(player);
-
+        // Give back items when closed
         for (int i = 0; i < 4; i++) { // input slots only
             ItemStack stack = fletchingInventory.getStack(i);
             if (!stack.isEmpty()) {
@@ -554,22 +455,8 @@ public class FletchingScreenHandler extends ScreenHandler {
     }
 
 
-
-
-    public int getPotionAmount() {
-        return ClientHeight;
-    }
-
-    public int getPotionColor() {
-        return ClientColor;
-    }
-
-    public Text getDisplayName() {
-        return Text.translatable("container.fletching"); // vanilla title
-    }
-
     public void savePotionData() {
-        if (playerInventory.player.getWorld().isClient) return; // ❌ client does nothing
+        if (playerInventory.player.getWorld().isClient) return;
 
         PotionData.setPotionLeft(PotionLeft);
         PotionData.setPotionColor(PotionColor);
@@ -590,8 +477,7 @@ public class FletchingScreenHandler extends ScreenHandler {
     }
     public void syncToClient() {
 
-        if (playerInventory.player.getWorld().isClient) return; // client does nothing
-        // Ensure the player is a server player
+        if (playerInventory.player.getWorld().isClient) return;
         if (!(playerInventory.player instanceof ServerPlayerEntity serverPlayer)) return;
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeInt(ClientHeight);
@@ -603,7 +489,6 @@ public class FletchingScreenHandler extends ScreenHandler {
     @Override
     public void sendContentUpdates() {
         super.sendContentUpdates();
-
         if (playerInventory.player instanceof ServerPlayerEntity serverPlayer) {
             PacketByteBuf buf = PacketByteBufs.create();
             buf.writeInt(ClientHeight);
