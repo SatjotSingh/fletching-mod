@@ -117,18 +117,36 @@ public class OpArrowItemEntity extends ArrowEntity {
             }
 
             if ("endereye".equals(this.featherType)) {
-                LivingEntity target = findNearestVisibleEnemy(10);
+                LivingEntity target = findNearestVisibleEnemy(16);
                 if (target != null) {
-                    Vec3d toTarget = target.getPos().subtract(this.getPos());
-                    double distance = toTarget.length();
-                    if (distance > 0) {
-                        Vec3d newVelocity = this.getVelocity().multiply(0.9).add(toTarget.normalize().multiply(0.5));
-                        this.setVelocity(newVelocity);
+
+                    Vec3d currentVel = this.getVelocity();
+                    double speed = currentVel.length();
+
+                    Vec3d toTarget = target.getEyePos().subtract(this.getPos());
+                    if (toTarget.lengthSquared() > 0.0001) {
+
+                        Vec3d desiredDir = toTarget.normalize();
+
+                        // 🔧 turn rate (smaller = smoother)
+                        double turnStrength = 0.55;
+
+                        Vec3d newDir = currentVel.normalize()
+                                .lerp(desiredDir, turnStrength)
+                                .normalize();
+
+                        // 🔧 slow the arrow slightly
+                        double newSpeed = speed * 0.81;
+
+                        // prevent stalling
+                        newSpeed = Math.max(newSpeed, 0.35);
+
+                        this.setVelocity(newDir.multiply(newSpeed));
                         this.velocityDirty = true;
                     }
-
                 }
             }
+
         }
         else {  // CLIENT SIDE
 
