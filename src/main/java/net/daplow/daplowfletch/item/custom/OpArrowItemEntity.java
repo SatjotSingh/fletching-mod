@@ -128,17 +128,16 @@ public class OpArrowItemEntity extends ArrowEntity {
 
                         Vec3d desiredDir = toTarget.normalize();
 
-                        // 🔧 turn rate (smaller = smoother)
+                        // turn rate
                         double turnStrength = 0.55;
 
                         Vec3d newDir = currentVel.normalize()
                                 .lerp(desiredDir, turnStrength)
                                 .normalize();
 
-                        // 🔧 slow the arrow slightly
+                        // slow the arrow slightly
                         double newSpeed = speed * 0.81;
 
-                        // prevent stalling
                         newSpeed = Math.max(newSpeed, 0.35);
 
                         this.setVelocity(newDir.multiply(newSpeed));
@@ -272,7 +271,7 @@ public class OpArrowItemEntity extends ArrowEntity {
                         this.getX(),
                         this.getY(),
                         this.getZ(),
-                        1.5f,
+                        2f,
                         Explosion.DestructionType.BREAK
                 );
                 this.discard();
@@ -328,7 +327,7 @@ public class OpArrowItemEntity extends ArrowEntity {
         Vec3d velocity = this.getVelocity();
         this.setVelocity(
                 velocity.x / 0.6,
-                velocity.y / 0.6,
+                velocity.y / 0.9,
                 velocity.z / 0.6
         );
     }

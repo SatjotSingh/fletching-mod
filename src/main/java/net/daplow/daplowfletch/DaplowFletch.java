@@ -4,10 +4,12 @@ import net.daplow.daplowfletch.block.ModBlocks;
 import net.daplow.daplowfletch.data.FletchingBreakHandler;
 import net.daplow.daplowfletch.entity.ModEntities;
 import net.daplow.daplowfletch.item.ModItems;
+import net.daplow.daplowfletch.other.ModCommands;
 import net.daplow.daplowfletch.screen.ModScreenHandler;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +25,9 @@ public class DaplowFletch implements ModInitializer {
 		LOGGER.info("WAKE UP DAPLOW!!!");
 
 		ModItems.register();
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			ModCommands.register(dispatcher);
+		});
 
 		ModBlocks.register();
 

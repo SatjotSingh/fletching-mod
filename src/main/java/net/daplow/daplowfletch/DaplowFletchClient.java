@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
+import net.fabricmc.fabric.api.object.builder.v1.client.model.FabricModelPredicateProviderRegistry;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.item.ItemColors;
@@ -56,14 +57,57 @@ public class DaplowFletchClient implements ClientModInitializer {
 
 
 
+        for (int i = 0; i < 6; i++) {
+            final int bit = i;
+            ModelPredicateProviderRegistry.register(
+                    ModItems.OP_ARROW,
+                    new Identifier("b" + bit),
+                    (stack, world, entity, seed) -> {
+                        int index = 0;
+                        if (stack.hasNbt() && stack.getNbt().contains("index")) {
+                            index = stack.getNbt().getInt("index"); // 0-39
+                        } else {
+
+                        }
+                        // Return 1.0 if the bit is set, 0.0 otherwise
+                        return (index >> bit) & 1;
+                    }
+            );
+        }
+        FabricModelPredicateProviderRegistry.register(
+                ModItems.OP_ARROW,
+                new Identifier("corrupt"),
+                (stack, world, entity, seed) -> {
+
+                    if (stack == null || !stack.hasNbt()) {
+                        return 1.0f; // corrupt
+                    }
+
+                    var nbt = stack.getNbt();
+
+                    if (nbt == null || !nbt.contains("index")) {
+                        return 1.0f; // corrupt
+                    }
+
+                    int index = nbt.getInt("index");
+
+                    // Optional validation range
+                    if (index < 0 || index > 999) {
+                        return 1.0f; // corrupt
+                    }
+
+                    return 0.0f; // valid
+                }
+        );
+
 
         ModelPredicateProviderRegistry.register(
-                ModItems.OP_ARROW[0],
+                ModItems.OP_ARROW,
                 new Identifier("daplowfletch", "stem"),
                 (stack, world, entity, seed) ->
                         stack.hasNbt() && stack.getNbt().contains("stem") ? 1.0F : 0.0F
         );
-        ModelPredicateProviderRegistry.register(ModItems.OP_ARROW[0],
+        ModelPredicateProviderRegistry.register(ModItems.OP_ARROW,
                 new Identifier("daplowfletch", "potion_stem"),
                 (stack, world, entity, seed) -> {
                     if (!stack.hasNbt()) return 0f;

@@ -1,6 +1,7 @@
 package net.daplow.daplowfletch.other;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -32,34 +33,41 @@ public class ModCommands {
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 
+
         RequiredArgumentBuilder<ServerCommandSource, String> potionArg =
                 argument("effect", StringArgumentType.word())
                         .suggests((context, builder) -> {
-
-                            builder.suggest("none"); // optional
-
+                            String typed = builder.getRemaining().toLowerCase();
+                            builder.suggest("none");
                             Registry.POTION.stream()
-                                    .map(potion -> Registry.POTION.getId(potion))
+                                    .map(Registry.POTION::getId)
                                     .filter(id -> id != null)
-                                    .map(id -> id.getPath()) // <-- THIS removes "minecraft:"
+                                    .map(Identifier::getPath)
+                                    .filter(name -> name.startsWith(typed))
+                                    .filter(name -> !name.equals("empty")) // ⭐ REMOVE EMPTY
                                     .forEach(builder::suggest);
-
                             return builder.buildFuture();
                         });
 
+
         RequiredArgumentBuilder<ServerCommandSource, String> stemArg =
-                RequiredArgumentBuilder.<ServerCommandSource, String>argument("stem", StringArgumentType.word())
+                argument("stem", StringArgumentType.word())
                         .suggests((context, builder) -> {
-                            for (String s : STEM_OPTIONS) builder.suggest(s);
+                            String typed = builder.getRemaining().toLowerCase();
+                            for (String s : STEM_OPTIONS) if (s.startsWith(typed)) builder.suggest(s);
                             return builder.buildFuture();
                         });
 
         RequiredArgumentBuilder<ServerCommandSource, String> extraArg =
-                RequiredArgumentBuilder.<ServerCommandSource, String>argument("extra", StringArgumentType.word())
+                argument("extra", StringArgumentType.word())
                         .suggests((context, builder) -> {
-                            for (String s : EXTRA_OPTIONS) builder.suggest(s);
+                            String typed = builder.getRemaining().toLowerCase();
+                            for (String s : EXTRA_OPTIONS) if (s.startsWith(typed)) builder.suggest(s);
                             return builder.buildFuture();
                         });
+
+        RequiredArgumentBuilder<ServerCommandSource, Integer> countArg =
+                argument("count", IntegerArgumentType.integer(1, 64));
 
         dispatcher.register(
                 literal("daplow")
@@ -69,114 +77,32 @@ public class ModCommands {
                                                 literal("op_arrow")
                                                         .then(potionArg
                                                                 .then(stemArg
-                                                                                .then(extraArg
-                                                                                                .executes(context -> {
-                                                                                                    ServerCommandSource source = context.getSource();
-                                                                                                    String effectId = StringArgumentType.getString(context, "effect");
-                                                                                                    String stemArgValue = StringArgumentType.getString(context, "stem");
-                                                                                                    String extraArgValue = StringArgumentType.getString(context, "extra");
+                                                                        .then(extraArg
 
-                                                                                                    ItemStack arrow = new ItemStack(ModItems.OP_ARROW);
+                                                                                // ✅ default count = 1
+                                                                                .executes(ctx -> giveArrow(ctx.getSource(),
+                                                                                        StringArgumentType.getString(ctx, "effect"),
+                                                                                        StringArgumentType.getString(ctx, "stem"),
+                                                                                        StringArgumentType.getString(ctx, "extra"),
+                                                                                        1))
 
-                                                                                                    // --- Potion logic ---
-                                                                                                    boolean hasPotion = false;
-                                                                                                    String potionName = "";
-
-                                                                                                    java.util.List<String> potionLore = new java.util.ArrayList<>();
-
-                                                                                                    if (!effectId.equalsIgnoreCase("none")) {
-                                                                                                        Identifier potionIdentifier = Identifier.tryParse(effectId);
-                                                                                                        if (potionIdentifier == null || !Registry.POTION.containsId(potionIdentifier)) {
-                                                                                                            source.sendFeedback(Text.literal("Invalid potion: " + effectId).formatted(Formatting.RED), false);
-                                                                                                            return 0;
-                                                                                                        }
-                                                                                                        Potion potion = Registry.POTION.get(potionIdentifier);
-                                                                                                        arrow.getOrCreateNbt().putString("Potion", "minecraft:" + effectId);
-                                                                                                        arrow.getOrCreateNbt().putBoolean("potion", true);
-                                                                                                        hasPotion = true;
-
-                                                                                                        ItemStack tempPotionStack = new ItemStack(Items.POTION);
-                                                                                                        PotionUtil.setPotion(tempPotionStack, potion);
-
-                                                                                                        for (StatusEffectInstance statusEffect : PotionUtil.getPotionEffects(tempPotionStack)) {
-                                                                                                            String loreLine = Text.translatable(statusEffect.getEffectType().getTranslationKey()).getString();
-                                                                                                            if (statusEffect.getAmplifier() > 0) {
-                                                                                                                loreLine += " " + toRoman(statusEffect.getAmplifier() + 1);
-                                                                                                            }
-                                                                                                            if (!statusEffect.getEffectType().isInstant()) {
-                                                                                                                int totalSeconds = Math.max(statusEffect.getDuration() / 8, 20) / 20;
-                                                                                                                int minutes = totalSeconds / 60;
-                                                                                                                int seconds = totalSeconds % 60;
-                                                                                                                loreLine += String.format(" (%d:%02d)", minutes, seconds);
-                                                                                                            }
-                                                                                                            potionLore.add(loreLine);
-                                                                                                        }
-                                                                                                        if (hasPotion && !potionLore.isEmpty()) {
-                                                                                                            potionName = " of " + tempPotionStack.getName().getString().replace("Potion of ", "");
-                                                                                                        }
-                                                                                                    }
-
-                                                                                                    // ---- Stem ----
-                                                                                                    boolean hasStem = false;
-                                                                                                    String stemName = "";
-                                                                                                    String stemLore = "";
-                                                                                                    int addon1 = 0;
-                                                                                                    switch (stemArgValue.toLowerCase()) {
-                                                                                                        case "gold" -> { arrow.getOrCreateNbt().putString("stem_variant", "gold"); arrow.getOrCreateNbt().putBoolean("stem", true); stemName = "Gilded ";stemLore = "Gold Stemmed"; hasStem = true; addon1 = 1; }
-                                                                                                        case "iron" -> { arrow.getOrCreateNbt().putString("stem_variant", "iron"); arrow.getOrCreateNbt().putBoolean("stem", true); stemName = "Iron ";stemLore = "Iron Stemmed"; hasStem = true; addon1 = 1; }
-                                                                                                        case "none" -> { hasStem = false; addon1 = 0; }
-                                                                                                        default -> { source.sendFeedback(Text.literal("Invalid stem type!").formatted(Formatting.RED), false); return 0; }
-                                                                                                    }
-
-                                                                                                    // ---- Extra / Feather ----
-                                                                                                    boolean hasFeather = false;
-                                                                                                    String featherName = "";
-                                                                                                    String featherLore = "";
-                                                                                                    int addon3 = 0;
-                                                                                                    switch (extraArgValue.toLowerCase()) {
-                                                                                                        case "tnt" -> { arrow.getOrCreateNbt().putBoolean("hasFeatherLayer", true); arrow.getOrCreateNbt().putString("feather", "tnt"); featherName = "TNT "; featherLore = "Kaboom on impact"; hasFeather = true; addon3 = 1; }
-                                                                                                        case "prismarine" -> { arrow.getOrCreateNbt().putBoolean("hasFeatherLayer", true); arrow.getOrCreateNbt().putString("feather", "prismarine"); featherName = "Water "; featherLore = "Can be used in Water"; hasFeather = true; addon3 = 2; }
-                                                                                                        case "fire" -> { arrow.getOrCreateNbt().putBoolean("hasFeatherLayer", true); arrow.getOrCreateNbt().putString("feather", "fire"); featherName = "Flaming "; featherLore = "Increased Fire Damage"; hasFeather = true; addon3 = 4; }
-                                                                                                        case "enderpearl" -> { arrow.getOrCreateNbt().putBoolean("hasFeatherLayer", true); arrow.getOrCreateNbt().putString("feather", "enderpearl"); featherName = "Warping "; featherLore = "Teleports player to location of arrow"; hasFeather = true; addon3 = 5; }
-                                                                                                        case "endereye" -> { arrow.getOrCreateNbt().putBoolean("hasFeatherLayer", true); arrow.getOrCreateNbt().putString("feather", "endereye"); featherName = "Homing "; featherLore = "Homes into nearby targets"; hasFeather = true; addon3 = 6; }
-                                                                                                        case "none" -> { hasFeather = false; addon3 = 0; }
-                                                                                                        default -> { source.sendFeedback(Text.literal("Invalid extra type!").formatted(Formatting.RED), false); return 0; }
-                                                                                                    }
-
-                                                                                                    // ---- Index ----
-                                                                                                    int addon2 = hasPotion ? 1 : 0;
-                                                                                                    int index = addon1 * 20 + addon2 * 10 + addon3;
-                                                                                                    arrow.getOrCreateNbt().putInt("index", index);
-
-                                                                                                    // ---- Name ----
-
-                                                                                                    arrow.setCustomName(Text.literal(stemName + featherName + "Arrow" + potionName).styled(style -> style.withItalic(false)));
-
-                                                                                                    // ---- Display / Lore ----
-                                                                                                    var displayTag = arrow.getOrCreateSubNbt("display");
-                                                                                                    NbtList loreList = new NbtList();
-                                                                                                    for (String loreLine : potionLore) {
-                                                                                                        loreList.add(NbtString.of(Text.Serializer.toJson(Text.literal(loreLine).styled(style -> style.withItalic(false)))));
-                                                                                                    }
-                                                                                                    if (!featherLore.isEmpty()) {
-                                                                                                        loreList.add(NbtString.of(Text.Serializer.toJson(Text.literal(featherLore).styled(style -> style.withItalic(false)))));
-                                                                                                    }
-                                                                                                    if (!stemLore.isEmpty()) {
-                                                                                                        loreList.add(NbtString.of(Text.Serializer.toJson(Text.literal(stemLore).styled(style -> style.withItalic(false)))));
-                                                                                                    }
-                                                                                                    displayTag.put("Lore", loreList);
-
-                                                                                                    // Give the arrow
-                                                                                                    source.getPlayer().getInventory().insertStack(arrow);
-                                                                                                    source.sendFeedback(Text.literal("Gave full OP Arrow!").formatted(Formatting.GREEN), false);
-                                                                                                    return 1;
-                                                                                                        })
-                                                                                        )
+                                                                                // ✅ optional count provided
+                                                                                .then(countArg
+                                                                                        .executes(ctx -> giveArrow(ctx.getSource(),
+                                                                                                StringArgumentType.getString(ctx, "effect"),
+                                                                                                StringArgumentType.getString(ctx, "stem"),
+                                                                                                StringArgumentType.getString(ctx, "extra"),
+                                                                                                IntegerArgumentType.getInteger(ctx, "count")
+                                                                                        ))
+                                                                                )
                                                                         )
+                                                                )
                                                         )
                                         )
                         )
-        );    }
+        );
+    }
+
     private static String toRoman(int number) {
         return switch (number) {
             case 1 -> "I";
@@ -192,4 +118,186 @@ public class ModCommands {
             default -> Integer.toString(number);
         };
     }
+
+    private static int giveArrow(ServerCommandSource source,
+                                 String effectId,
+                                 String stemArgValue,
+                                 String extraArgValue,
+                                 int count) {
+
+        ItemStack arrow = new ItemStack(ModItems.OP_ARROW, count);
+
+        // --- Potion logic ---
+        boolean hasPotion = false;
+        String potionName = "";
+        java.util.List<String> potionLore = new java.util.ArrayList<>();
+
+        if (!effectId.equalsIgnoreCase("none")) {
+
+            Identifier potionIdentifier = Identifier.tryParse(effectId);
+
+            if (potionIdentifier == null || !Registry.POTION.containsId(potionIdentifier)) {
+                source.sendFeedback(Text.literal("Invalid potion effect: " + effectId).formatted(Formatting.RED), false);
+                return 0;
+            }
+
+            Potion potion = Registry.POTION.get(potionIdentifier);
+
+            arrow.getOrCreateNbt().putString("Potion", "minecraft:" + effectId);
+            arrow.getOrCreateNbt().putBoolean("potion", true);
+            hasPotion = true;
+
+            ItemStack tempPotionStack = new ItemStack(Items.POTION);
+            PotionUtil.setPotion(tempPotionStack, potion);
+
+            for (StatusEffectInstance statusEffect : PotionUtil.getPotionEffects(tempPotionStack)) {
+
+                String loreLine = Text.translatable(
+                        statusEffect.getEffectType().getTranslationKey()
+                ).getString();
+
+                if (statusEffect.getAmplifier() > 0) {
+                    loreLine += " " + toRoman(statusEffect.getAmplifier() + 1);
+                }
+
+                if (!statusEffect.getEffectType().isInstant()) {
+                    int totalSeconds = Math.max(statusEffect.getDuration() / 8, 20) / 20;
+                    int minutes = totalSeconds / 60;
+                    int seconds = totalSeconds % 60;
+                    loreLine += String.format(" (%d:%02d)", minutes, seconds);
+                }
+
+                potionLore.add(loreLine);
+            }
+
+            if (hasPotion && !potionLore.isEmpty()) {
+                potionName = " of " + tempPotionStack.getName().getString().replace("Potion of ", "");
+            }
+        }
+
+        // ---- Stem ----
+        boolean hasStem = false;
+        String stemName = "";
+        String stemLore = "";
+        int addon1 = 0;
+
+        switch (stemArgValue.toLowerCase()) {
+            case "gold" -> {
+                arrow.getOrCreateNbt().putString("stem_variant", "gold");
+                arrow.getOrCreateNbt().putBoolean("stem", true);
+                stemName = "Gilded ";
+                stemLore = "Gold Stemmed";
+                hasStem = true;
+                addon1 = 1;
+            }
+            case "iron" -> {
+                arrow.getOrCreateNbt().putString("stem_variant", "iron");
+                arrow.getOrCreateNbt().putBoolean("stem", true);
+                stemName = "Iron ";
+                stemLore = "Iron Stemmed";
+                hasStem = true;
+                addon1 = 1;
+            }
+            case "none" -> addon1 = 0;
+            default -> {
+                source.sendFeedback(Text.literal("Invalid stem: " + stemArgValue).formatted(Formatting.RED), false);
+                return 0;
+            }
+        }
+
+        // ---- Extra ----
+        boolean hasFeather = false;
+        String featherName = "";
+        String featherLore = "";
+        int addon3 = 0;
+
+        switch (extraArgValue.toLowerCase()) {
+            case "tnt" -> {
+                arrow.getOrCreateNbt().putBoolean("hasFeatherLayer", true);
+                arrow.getOrCreateNbt().putString("feather", "tnt");
+                featherName = "TNT ";
+                featherLore = "Kaboom on impact";
+                hasFeather = true;
+                addon3 = 1;
+            }
+            case "prismarine" -> {
+                arrow.getOrCreateNbt().putBoolean("hasFeatherLayer", true);
+                arrow.getOrCreateNbt().putString("feather", "prismarine");
+                featherName = "Water ";
+                featherLore = "Can be used in Water";
+                hasFeather = true;
+                addon3 = 2;
+            }
+            case "fire" -> {
+                arrow.getOrCreateNbt().putBoolean("hasFeatherLayer", true);
+                arrow.getOrCreateNbt().putString("feather", "fire");
+                featherName = "Flaming ";
+                featherLore = "Increased Fire Damage";
+                hasFeather = true;
+                addon3 = 4;
+            }
+            case "enderpearl" -> {
+                arrow.getOrCreateNbt().putBoolean("hasFeatherLayer", true);
+                arrow.getOrCreateNbt().putString("feather", "enderpearl");
+                featherName = "Warping ";
+                featherLore = "Teleports player to location of arrow";
+                hasFeather = true;
+                addon3 = 5;
+            }
+            case "endereye" -> {
+                arrow.getOrCreateNbt().putBoolean("hasFeatherLayer", true);
+                arrow.getOrCreateNbt().putString("feather", "endereye");
+                featherName = "Homing ";
+                featherLore = "Homes into nearby targets";
+                hasFeather = true;
+                addon3 = 6;
+            }
+            case "none" -> addon3 = 0;
+            default -> {
+                source.sendFeedback(Text.literal("Invalid type: " + extraArgValue).formatted(Formatting.RED), false);
+                return 0;
+            }
+        }
+
+        // ---- Index ----
+        int addon2 = hasPotion ? 1 : 0;
+        int index = addon1 * 20 + addon2 * 10 + addon3;
+        arrow.getOrCreateNbt().putInt("index", index);
+
+        // ---- Name ----
+        arrow.setCustomName(
+                Text.literal(stemName + featherName + "Arrow" + potionName)
+                        .styled(style -> style.withItalic(false))
+        );
+
+        // ---- Lore ----
+        var displayTag = arrow.getOrCreateSubNbt("display");
+        NbtList loreList = new NbtList();
+
+        for (String loreLine : potionLore) {
+            loreList.add(NbtString.of(Text.Serializer.toJson(
+                    Text.literal(loreLine).styled(style -> style.withItalic(false))
+            )));
+        }
+
+        if (!featherLore.isEmpty()) {
+            loreList.add(NbtString.of(Text.Serializer.toJson(
+                    Text.literal(featherLore).styled(style -> style.withItalic(false))
+            )));
+        }
+
+        if (!stemLore.isEmpty()) {
+            loreList.add(NbtString.of(Text.Serializer.toJson(
+                    Text.literal(stemLore).styled(style -> style.withItalic(false))
+            )));
+        }
+
+        displayTag.put("Lore", loreList);
+
+        source.getPlayer().getInventory().insertStack(arrow);
+        source.sendFeedback(Text.literal("Gave OP Arrow x" + count + "!").formatted(Formatting.GREEN), false);
+
+        return 1;
+    }
+
 }

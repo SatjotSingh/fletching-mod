@@ -192,6 +192,7 @@ public class FletchingScreenHandler extends ScreenHandler {
         String potion_lore = "";
         String potion_duration_lore = "";
         String feather_lore = "";
+        String stem_lore = "";
 
         List<String> all_potion_lore = new ArrayList<>();
 
@@ -213,7 +214,7 @@ public class FletchingScreenHandler extends ScreenHandler {
         }
 
         if (in0.getItem() == Items.ARROW) {
-            newOutput = new ItemStack(ModItems.OP_ARROW[0]);
+            newOutput = new ItemStack(ModItems.OP_ARROW);
             if (PotionLeft > 0) {
                 String potionId = "minecraft:water";
                 potionId = PotionID;
@@ -265,6 +266,7 @@ public class FletchingScreenHandler extends ScreenHandler {
                 Stem_Hanji = true;
                 addon1 = 1;
                 string_stem = "Gilded ";
+                stem_lore = "Gold Stemmed";
             }
             if (in2.getItem() == Items.IRON_NUGGET) {
                 newOutput.getOrCreateNbt().putString("stem_variant", "iron");
@@ -272,6 +274,7 @@ public class FletchingScreenHandler extends ScreenHandler {
                 Stem_Hanji = true;
                 addon1 = 1;
                 string_stem = "Iron ";
+                stem_lore = "Iron Stemmed";
 
             }
 
@@ -328,7 +331,8 @@ public class FletchingScreenHandler extends ScreenHandler {
 
 
         int index = addon1 * 20 + addon2 * 10 + addon3; // 0..39
-        ItemStack result = new ItemStack(ModItems.OP_ARROW[index]);
+        newOutput.getOrCreateNbt().putInt("index", index);
+        ItemStack result = new ItemStack(ModItems.OP_ARROW);
 
         if (newOutput.hasNbt()) {
             result.setNbt(newOutput.getNbt().copy());
@@ -352,6 +356,9 @@ public class FletchingScreenHandler extends ScreenHandler {
             }        }
         if (!(feather_lore=="")) {
             loreList.add(NbtString.of(Text.Serializer.toJson(Text.literal(feather_lore).styled(style -> style.withItalic(false)))));
+        }
+        if (!(stem_lore=="")) {
+            loreList.add(NbtString.of(Text.Serializer.toJson(Text.literal(stem_lore).styled(style -> style.withItalic(false)))));
         }
         displayTag.put("Lore", loreList);
 

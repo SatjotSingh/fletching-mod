@@ -1,9 +1,50 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "daplow-fletch:item/op_arrow",
-    "layer1": "${ADDON1}",
-    "layer2": "${ADDON2}",
-    "layer3": "${ADDON3}"
-  }
+    "layer0": "daplow-fletch:item/op_arrow"
+  },
+  "overrides": [
+
+    { "predicate": { "b5":0.0,"b4":0.0,"b3":0.0,"b2":0.0,"b1":0.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_0" },
+    { "predicate": { "b5":0.0,"b4":0.0,"b3":0.0,"b2":0.0,"b1":0.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_1" },
+    { "predicate": { "b5":0.0,"b4":0.0,"b3":0.0,"b2":0.0,"b1":1.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_2" },
+    { "predicate": { "b5":0.0,"b4":0.0,"b3":0.0,"b2":0.0,"b1":1.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_3" },
+    { "predicate": { "b5":0.0,"b4":0.0,"b3":0.0,"b2":1.0,"b1":0.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_4" },
+    { "predicate": { "b5":0.0,"b4":0.0,"b3":0.0,"b2":1.0,"b1":0.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_5" },
+    { "predicate": { "b5":0.0,"b4":0.0,"b3":0.0,"b2":1.0,"b1":1.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_6" },
+    { "predicate": { "b5":0.0,"b4":0.0,"b3":0.0,"b2":1.0,"b1":1.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_7" },
+    { "predicate": { "b5":0.0,"b4":0.0,"b3":1.0,"b2":0.0,"b1":0.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_8" },
+    { "predicate": { "b5":0.0,"b4":0.0,"b3":1.0,"b2":0.0,"b1":0.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_9" },
+    { "predicate": { "b5":0.0,"b4":0.0,"b3":1.0,"b2":0.0,"b1":1.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_10" },
+    { "predicate": { "b5":0.0,"b4":0.0,"b3":1.0,"b2":0.0,"b1":1.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_11" },
+    { "predicate": { "b5":0.0,"b4":0.0,"b3":1.0,"b2":1.0,"b1":0.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_12" },
+    { "predicate": { "b5":0.0,"b4":0.0,"b3":1.0,"b2":1.0,"b1":0.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_13" },
+    { "predicate": { "b5":0.0,"b4":0.0,"b3":1.0,"b2":1.0,"b1":1.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_14" },
+    { "predicate": { "b5":0.0,"b4":0.0,"b3":1.0,"b2":1.0,"b1":1.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_15" },
+    { "predicate": { "b5":0.0,"b4":1.0,"b3":0.0,"b2":0.0,"b1":0.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_16" },
+    { "predicate": { "b5":0.0,"b4":1.0,"b3":0.0,"b2":0.0,"b1":0.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_17" },
+    { "predicate": { "b5":0.0,"b4":1.0,"b3":0.0,"b2":0.0,"b1":1.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_18" },
+    { "predicate": { "b5":0.0,"b4":1.0,"b3":0.0,"b2":0.0,"b1":1.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_19" },
+    { "predicate": { "b5":0.0,"b4":1.0,"b3":0.0,"b2":1.0,"b1":0.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_20" },
+    { "predicate": { "b5":0.0,"b4":1.0,"b3":0.0,"b2":1.0,"b1":0.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_21" },
+    { "predicate": { "b5":0.0,"b4":1.0,"b3":0.0,"b2":1.0,"b1":1.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_22" },
+    { "predicate": { "b5":0.0,"b4":1.0,"b3":0.0,"b2":1.0,"b1":1.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_23" },
+    { "predicate": { "b5":0.0,"b4":1.0,"b3":1.0,"b2":0.0,"b1":0.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_24" },
+    { "predicate": { "b5":0.0,"b4":1.0,"b3":1.0,"b2":0.0,"b1":0.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_25" },
+    { "predicate": { "b5":0.0,"b4":1.0,"b3":1.0,"b2":0.0,"b1":1.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_26" },
+    { "predicate": { "b5":0.0,"b4":1.0,"b3":1.0,"b2":0.0,"b1":1.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_27" },
+    { "predicate": { "b5":0.0,"b4":1.0,"b3":1.0,"b2":1.0,"b1":0.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_28" },
+    { "predicate": { "b5":0.0,"b4":1.0,"b3":1.0,"b2":1.0,"b1":0.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_29" },
+    { "predicate": { "b5":0.0,"b4":1.0,"b3":1.0,"b2":1.0,"b1":1.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_30" },
+    { "predicate": { "b5":0.0,"b4":1.0,"b3":1.0,"b2":1.0,"b1":1.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_31" },
+    { "predicate": { "b5":1.0,"b4":0.0,"b3":0.0,"b2":0.0,"b1":0.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_32" },
+    { "predicate": { "b5":1.0,"b4":0.0,"b3":0.0,"b2":0.0,"b1":0.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_33" },
+    { "predicate": { "b5":1.0,"b4":0.0,"b3":0.0,"b2":0.0,"b1":1.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_34" },
+    { "predicate": { "b5":1.0,"b4":0.0,"b3":0.0,"b2":0.0,"b1":1.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_35" },
+    { "predicate": { "b5":1.0,"b4":0.0,"b3":0.0,"b2":1.0,"b1":0.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_36" },
+    { "predicate": { "b5":1.0,"b4":0.0,"b3":0.0,"b2":1.0,"b1":0.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_37" },
+    { "predicate": { "b5":1.0,"b4":0.0,"b3":0.0,"b2":1.0,"b1":1.0,"b0":0.0 }, "model": "daplow-fletch:item/op_arrow_38" },
+    { "predicate": { "b5":1.0,"b4":0.0,"b3":0.0,"b2":1.0,"b1":1.0,"b0":1.0 }, "model": "daplow-fletch:item/op_arrow_39" },
+    { "predicate": { "corrupt":1 }, "model": "daplow-fletch:item/currupt_arrow" }
+  ]
 }
