@@ -42,6 +42,8 @@ public class DaplowFletchClient implements ClientModInitializer {
         );
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.ARROW_POWER_BLOCK, RenderLayer.getTranslucent());
 
+
+
         ClientPlayNetworking.registerGlobalReceiver(POTION_INFO, (client, handler, buf, responseSender) -> {
             int height = buf.readInt();
             int color = buf.readInt();

@@ -136,7 +136,7 @@ public class ModCommands {
 
             Identifier potionIdentifier = Identifier.tryParse(effectId);
 
-            if (potionIdentifier == null || !Registry.POTION.containsId(potionIdentifier)) {
+            if (potionIdentifier == null) {
                 source.sendFeedback(Text.literal("Invalid potion effect: " + effectId).formatted(Formatting.RED), false);
                 return 0;
             }
