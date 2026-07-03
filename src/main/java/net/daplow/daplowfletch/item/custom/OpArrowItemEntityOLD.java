@@ -19,22 +19,18 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 
 import java.util.List;
 
-public class OpArrowItemEntity extends ArrowEntity {
+public class OpArrowItemEntityOLD extends ArrowEntity {
 
     public String potionId = "";
     public String stemVariant = "";
@@ -47,7 +43,7 @@ public class OpArrowItemEntity extends ArrowEntity {
     private BlockPos poweredPos;
 
     private static final TrackedData<Integer> POTION_COLOR =
-            DataTracker.registerData(OpArrowItemEntity.class, TrackedDataHandlerRegistry.INTEGER);
+            DataTracker.registerData(OpArrowItemEntityOLD.class, TrackedDataHandlerRegistry.INTEGER);
 
     @Override
     protected void initDataTracker() {
@@ -60,11 +56,11 @@ public class OpArrowItemEntity extends ArrowEntity {
     }
 
     // Required for entity loading
-    public OpArrowItemEntity(EntityType<? extends ArrowEntity> type, World world) {
+    public OpArrowItemEntityOLD(EntityType<? extends ArrowEntity> type, World world) {
         super(type, world);
     }
 
-    public OpArrowItemEntity(World world, LivingEntity owner, ItemStack stack) {
+    public OpArrowItemEntityOLD(World world, LivingEntity owner, ItemStack stack) {
         super((EntityType<? extends ArrowEntity>) ModEntities.OP_ARROW_ENTITY, world);
         this.setOwner(owner);
         this.setPosition(owner.getX(), owner.getEyeY() - 0.1, owner.getZ());

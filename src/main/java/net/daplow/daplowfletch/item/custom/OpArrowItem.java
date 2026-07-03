@@ -9,7 +9,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,8 +62,9 @@ public class OpArrowItem extends ArrowItem {
 
     @Override
     public ArrowEntity createArrow(World world, ItemStack stack, LivingEntity shooter) {
-        OpArrowItemEntity arrow = new OpArrowItemEntity(world, shooter, stack);
+        NewOpArrowItemEntity arrow = new NewOpArrowItemEntity(world, shooter, stack);
 
+        //master
 
 
         return arrow;
