@@ -1,4 +1,4 @@
-package net.daplow.daplowfletch.network;
+package net.daplow.daplowfletch.other.network;
 
 import net.minecraft.util.Identifier;
 

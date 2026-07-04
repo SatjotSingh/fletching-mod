@@ -1,35 +1,27 @@
 package net.daplow.daplowfletch;
 
 import net.daplow.daplowfletch.block.ModBlocks;
-import net.daplow.daplowfletch.entity.ModEntities;
+import net.daplow.daplowfletch.other.entity.ModEntities;
 import net.daplow.daplowfletch.item.ModItems;
 import net.daplow.daplowfletch.screen.FletchingScreenHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.daplow.daplowfletch.screen.FletchingScreen;
 import net.daplow.daplowfletch.screen.ModScreenHandler;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
-import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.client.model.FabricModelPredicateProviderRegistry;
-import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.ArrowEntityRenderer;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
-import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-import static net.daplow.daplowfletch.network.ModPackets.*;
+import static net.daplow.daplowfletch.other.network.ModPackets.*;
 
 @SuppressWarnings("deprecation")
 public class DaplowFletchClient implements ClientModInitializer {
@@ -126,14 +118,17 @@ public class DaplowFletchClient implements ClientModInitializer {
             }
 
             if (tintIndex == 1) { // stem layer
-                if (!stack.hasNbt()) return 0xFFFFFF;
+                if (!stack.hasNbt()) return 16777215;
                 String stem = stack.getNbt().getString("stem_variant");
-                if ("gold".equals(stem)) return 0xFFD700;
-                if ("iron".equals(stem)) return 0xBEBEBE;
-                return 0xFFFFFF;
+                int color = stack.getNbt().getInt("color");
+                //System.out.println(color);
+
+                //if ("gild".equals(stem)) return 0xFFD700;
+                //if ("iron".equals(stem)) return 0xBEBEBE;
+                return color;
             }
 
-            return 0xFFFFFF; // base arrow
+            return 16777215; // base arrow
         }, ModItems.OP_ARROW);
 
 

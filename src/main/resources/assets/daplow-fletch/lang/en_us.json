@@ -1,3 +1,4 @@
 {
-  "item.daplow-fletch.op_arrow" : "Currupt Arrow (use /daplow give op_arrow)"
+  "item.daplow-fletch.op_arrow" : "Currupt Arrow (use /daplow give op_arrow)",
+  "itemGroup.daplow-fletch.daplow_fletch_tab" : "Daplow's Arrows"
 }

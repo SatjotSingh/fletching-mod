@@ -1,0 +1,16 @@
+{
+  "item" : "minecraft:tnt",
+  "effect" : "daplow-fletch:tnt_feather",
+
+
+  "Data" : {
+    "amplifier": 1,
+
+    "variant" : 1
+  },
+
+  "Info" : {
+    "Name" : "TNT",
+    "Lore" : "Kaboom on Impact"
+  }
+}

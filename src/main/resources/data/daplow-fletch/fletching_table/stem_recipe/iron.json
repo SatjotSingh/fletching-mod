@@ -1,0 +1,14 @@
+{
+  "item" : "minecraft:iron_nugget",
+  "effect" : "daplow-fletch:iron_stem",
+  "color" : 13882323,
+
+  "Data" : {
+    "damage": 2
+  },
+
+  "Info" : {
+    "Name" : "Iron",
+    "Lore" : "Iron Stemmed"
+  }
+}

@@ -1,0 +1,16 @@
+
+{
+  "item" : "minecraft:prismarine_shard",
+  "effect" : "daplow-fletch:prismarine_feather",
+
+
+  "Data" : {
+    "variant" : 2
+
+  },
+
+  "Info" : {
+    "Name" : "Water",
+    "Lore" : "Can be used in Water"
+  }
+}

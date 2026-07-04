@@ -1,0 +1,16 @@
+{
+  "item" : "minecraft:nether_star",
+  "effect" : "daplow-fletch:tnt_feather",
+
+
+  "Data" : {
+    "amplifier": 50,
+
+    "variant" : 1
+  },
+
+  "Info" : {
+    "Name" : "BRAHMASTRA",
+    "Lore" : "DON'T USE IT WILL GO BOOM"
+  }
+}

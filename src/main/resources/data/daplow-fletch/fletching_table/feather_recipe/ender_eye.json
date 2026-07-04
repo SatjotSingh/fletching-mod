@@ -1,0 +1,13 @@
+{
+  "item" : "minecraft:ender_eye",
+  "effect" : "daplow-fletch:homing_feather",
+
+  "Data" : {
+    "variant": 6,
+    "radius": 16
+  },
+  "Info" : {
+    "Name": "Homing",
+    "Lore": "Homes into nearby targets"
+  }
+}

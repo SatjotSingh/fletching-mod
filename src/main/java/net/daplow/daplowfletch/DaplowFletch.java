@@ -2,14 +2,17 @@ package net.daplow.daplowfletch;
 
 import net.daplow.daplowfletch.block.ModBlocks;
 import net.daplow.daplowfletch.data.FletchingBreakHandler;
-import net.daplow.daplowfletch.entity.ModEntities;
+import net.daplow.daplowfletch.other.entity.ModEntities;
 import net.daplow.daplowfletch.item.ModItems;
 import net.daplow.daplowfletch.other.ModCommands;
+import net.daplow.daplowfletch.other.recipes.FeatherRecipeLoader;
+import net.daplow.daplowfletch.other.recipes.StemRecipeLoader;
 import net.daplow.daplowfletch.screen.ModScreenHandler;
 import net.fabricmc.api.ModInitializer;
 
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.resource.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +39,11 @@ public class DaplowFletch implements ModInitializer {
 		ModScreenHandler.register();
 
 		FletchingBreakHandler.register();
+
+		ResourceManagerHelper.get(ResourceType.SERVER_DATA)
+				.registerReloadListener(new StemRecipeLoader());
+		ResourceManagerHelper.get(ResourceType.SERVER_DATA)
+				.registerReloadListener(new FeatherRecipeLoader());
 
 
 	}

@@ -1,8 +1,16 @@
 package net.daplow.daplowfletch.screen;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import net.daplow.daplowfletch.data.FletchingPotionData;
 import net.daplow.daplowfletch.data.FletchingTableWorldData;
 import net.daplow.daplowfletch.item.ModItems;
+import net.daplow.daplowfletch.item.arrow.SpawnOpArrow;
+import net.daplow.daplowfletch.other.recipes.FeatherRecipe;
+import net.daplow.daplowfletch.other.recipes.FeatherRecipeManager;
+import net.daplow.daplowfletch.other.recipes.StemRecipe;
+import net.daplow.daplowfletch.other.recipes.StemRecipeManager;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -10,9 +18,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.PotionItem;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.network.PacketByteBuf;
@@ -29,8 +39,11 @@ import net.minecraft.util.registry.Registry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import static net.daplow.daplowfletch.network.ModPackets.*;
+import static net.daplow.daplowfletch.other.network.ModPackets.*;
+import static net.daplow.daplowfletch.other.recipes.StemRecipeManager.RECIPES;
 
 public class FletchingScreenHandler extends ScreenHandler {
 
@@ -87,7 +100,7 @@ public class FletchingScreenHandler extends ScreenHandler {
         this.addSlot(new Slot(fletchingInventory, 2, 80, 43) {
             @Override
             public boolean canInsert(ItemStack stack) {
-                return stack.isOf(Items.GOLD_NUGGET) || stack.isOf(Items.IRON_NUGGET);
+                return StemRecipeManager.getOpt(stack.getItem()).isPresent();
             }
         });
         this.addSlot(new Slot(fletchingInventory, 3, 80, 62));
@@ -174,11 +187,12 @@ public class FletchingScreenHandler extends ScreenHandler {
         ItemStack potionSlot = fletchingInventory.getStack(1);
         ItemStack in2 = fletchingInventory.getStack(2);
         ItemStack in3 = fletchingInventory.getStack(3);
+        PotionLeft = PotionData.getPotionLeft();
+
 
         boolean Potion_Hanji = false;
         boolean Stem_Hanji = false;
         boolean Other_Hanji = false;
-        PotionLeft = PotionData.getPotionLeft();
 
         int addon1 = 0;
         int addon2 = 0;
@@ -213,161 +227,26 @@ public class FletchingScreenHandler extends ScreenHandler {
             }
         }
 
+        String potionId = PotionID;
+
+        if (!(PotionLeft > 0)) {
+            potionId = "none";
+        }
+        ItemStack result = ItemStack.EMPTY;
         if (in0.getItem() == Items.ARROW) {
-            newOutput = new ItemStack(ModItems.OP_ARROW);
-            if (PotionLeft > 0) {
-                String potionId = "minecraft:water";
-                potionId = PotionID;
-                Potion_Hanji = true;
-                newOutput.getOrCreateNbt().putString("Potion", potionId);
-                newOutput.getOrCreateNbt().putBoolean("potion", true);
-                addon2 = 1;
-
-                ItemStack tempPotionStack = new ItemStack(Items.POTION);
-
-                Potion potion = Registry.POTION.get(new Identifier(potionId));
-                PotionUtil.setPotion(tempPotionStack, potion);
-
-                string_potion =
-                        " of " + tempPotionStack.getName().getString().replace("Potion of ", "");
-
-
-                for (StatusEffectInstance effect : PotionUtil.getPotionEffects(tempPotionStack)) {
-                    potion_lore =
-                            Text.translatable(effect.getEffectType().getTranslationKey()).getString();
-                    int amplifier = effect.getAmplifier();
-                    if (amplifier > 0) {
-                        potion_lore += " " + toRoman(amplifier + 1);
-                    }
-                    int potionTime = Math.max(effect.getDuration() / 8, 20);
-                    int totalSeconds = potionTime / 20;
-                    int minutes = totalSeconds / 60;
-                    int seconds = totalSeconds % 60;
-
-                    potion_duration_lore =
-                            String.format("%d:%02d", minutes, seconds);
-                    String finalLoreLine = "of Unknown Potion";
-                    if (effect.getEffectType().isInstant()) {
-                        finalLoreLine = potion_lore;
-                    } else {
-                        finalLoreLine = potion_lore + " (" + potion_duration_lore + ")";
-                    }
-                    all_potion_lore.add(finalLoreLine);
-                }
-
-
-
-
-            }
-
-            if (in2.getItem() == Items.GOLD_NUGGET) {
-                newOutput.getOrCreateNbt().putString("stem_variant", "gold");
-                newOutput.getOrCreateNbt().putBoolean("stem", true);
-                Stem_Hanji = true;
-                addon1 = 1;
-                string_stem = "Gilded ";
-                stem_lore = "Gold Stemmed";
-            }
-            if (in2.getItem() == Items.IRON_NUGGET) {
-                newOutput.getOrCreateNbt().putString("stem_variant", "iron");
-                newOutput.getOrCreateNbt().putBoolean("stem", true);
-                Stem_Hanji = true;
-                addon1 = 1;
-                string_stem = "Iron ";
-                stem_lore = "Iron Stemmed";
-
-            }
-
-            if (in3.getItem() == Items.TNT) {
-                newOutput.getOrCreateNbt().putBoolean("hasFeatherLayer", true);
-                newOutput.getOrCreateNbt().putString("feather", "tnt");
-                Other_Hanji = true;
-                addon3 = 1;
-                string_feather = "TNT ";
-                feather_lore = "Kaboom on impact";
-
-            } else if (in3.getItem() == Items.PRISMARINE_SHARD) {
-                newOutput.getOrCreateNbt().putBoolean("hasFeatherLayer", true);
-                newOutput.getOrCreateNbt().putString("feather", "prismarine");
-                Other_Hanji = true;
-                addon3 = 2;
-                string_feather = "Water ";
-                feather_lore = "Can be used in Water";
-            }
-            else if (in3.getItem() == Items.FIRE_CHARGE) {
-                newOutput.getOrCreateNbt().putBoolean("hasFeatherLayer", true);
-                newOutput.getOrCreateNbt().putString("feather", "fire");
-                Other_Hanji = true;
-                addon3 = 4;
-                string_feather = "Flaming ";
-                feather_lore = "Increased Fire Damage";
-            }
-            else if (in3.getItem() == Items.ENDER_PEARL) {
-                newOutput.getOrCreateNbt().putBoolean("hasFeatherLayer", true);
-                newOutput.getOrCreateNbt().putString("feather", "enderpearl");
-                Other_Hanji = true;
-                addon3 = 5;
-                string_feather = "Warping ";
-                feather_lore = "Teleports player to location of arrow";
-            }
-            else if (in3.getItem() == Items.ENDER_EYE) {
-                newOutput.getOrCreateNbt().putBoolean("hasFeatherLayer", true);
-                newOutput.getOrCreateNbt().putString("feather", "endereye");
-                Other_Hanji = true;
-                addon3 = 6;
-                string_feather = "Homing ";
-                feather_lore = "Homes into nearby targets";
-            }
-
-            else {
-                if (!in3.isEmpty()) {
-                Potion_Hanji = false;
-                Stem_Hanji = false;
-                Other_Hanji = false;
-            }
-            }
-
+            result = SpawnOpArrow.getStack(potionId, in2, in3, 1);
         }
 
-
-        int index = addon1 * 20 + addon2 * 10 + addon3; // 0..39
-        newOutput.getOrCreateNbt().putInt("index", index);
-        ItemStack result = new ItemStack(ModItems.OP_ARROW);
-
-        if (newOutput.hasNbt()) {
-            result.setNbt(newOutput.getNbt().copy());
-        }
-        result.getOrCreateNbt().putInt("index", index);
-        result.setCustomName(Text.literal(string_stem + string_feather + "Arrow" + string_potion).styled(style -> style.withItalic(false)));
-
-        var displayTag = result.getOrCreateSubNbt("display");
-        NbtList loreList = new NbtList();
-        if (!(potion_lore=="")) {
-
-            for (String loreLine : all_potion_lore) {
-                loreList.add(
-                        NbtString.of(
-                                Text.Serializer.toJson(
-                                        Text.literal(loreLine)
-                                                .styled(style -> style.withItalic(false))
-                                )
-                        )
-                );
-            }        }
-        if (!(feather_lore=="")) {
-            loreList.add(NbtString.of(Text.Serializer.toJson(Text.literal(feather_lore).styled(style -> style.withItalic(false)))));
-        }
-        if (!(stem_lore=="")) {
-            loreList.add(NbtString.of(Text.Serializer.toJson(Text.literal(stem_lore).styled(style -> style.withItalic(false)))));
-        }
-        displayTag.put("Lore", loreList);
-
-        if (!Potion_Hanji & !Stem_Hanji & !Other_Hanji) {
+        if (in2.isEmpty() && in3.isEmpty() && PotionLeft <1) {
             result = ItemStack.EMPTY;
         }
-        if (index==0) {
+
+        FeatherRecipe featherRecipe =
+                FeatherRecipeManager.get(in3.getItem());
+        if (featherRecipe == null && !in3.isEmpty()) {
             result = ItemStack.EMPTY;
         }
+
 
         if (!ItemStack.areEqual(current, result) && !ItemStack.areNbtEqual(current, result)) {
             fletchingInventory.setStack(4, result);
@@ -378,21 +257,6 @@ public class FletchingScreenHandler extends ScreenHandler {
         updatingOutput = false;
     }
 
-    private static String toRoman(int number) {
-        return switch (number) {
-            case 1 -> "I";
-            case 2 -> "II";
-            case 3 -> "III";
-            case 4 -> "IV";
-            case 5 -> "V";
-            case 6 -> "VI";
-            case 7 -> "VII";
-            case 8 -> "VIII";
-            case 9 -> "IX";
-            case 10 -> "X";
-            default -> Integer.toString(number);
-        };
-    }
 
     @Override
     public ItemStack transferSlot(PlayerEntity player, int index) {
@@ -424,7 +288,7 @@ public class FletchingScreenHandler extends ScreenHandler {
                     moved = this.insertItem(stack, 0, 1, false);
                 } else if (stack.getItem() instanceof PotionItem) {
                     moved = this.insertItem(stack, 1, 2, false);
-                } else if (stack.getItem()==Items.IRON_NUGGET||stack.getItem()==Items.GOLD_NUGGET) {
+                } else if (StemRecipeManager.getOpt(stack.getItem()).isPresent()) {
                     moved = this.insertItem(stack, 2, 3, false);
                 } else {
                     moved = this.insertItem(stack, 3, 4, false);
@@ -503,4 +367,7 @@ public class FletchingScreenHandler extends ScreenHandler {
             ServerPlayNetworking.send(serverPlayer, POTION_INFO, buf);
         }
     }
+
+
+
 }

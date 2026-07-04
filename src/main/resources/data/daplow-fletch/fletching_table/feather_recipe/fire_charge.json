@@ -1,0 +1,15 @@
+{
+  "item" : "minecraft:fire_charge",
+  "effect" : "daplow-fletch:flame_feather",
+
+  "Data" : {
+    "timer" : 10,
+    "variant": 4
+  },
+
+  "Info" : {
+    "Name" : "Flaming",
+    "Lore" : "Increased Fire Damage"
+  }
+
+}

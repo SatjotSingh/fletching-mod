@@ -1,7 +1,7 @@
 package net.daplow.daplowfletch.item.custom;
 
 import net.daplow.daplowfletch.block.ModBlocks;
-import net.daplow.daplowfletch.entity.ModEntities;
+import net.daplow.daplowfletch.other.entity.ModEntities;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -85,6 +85,7 @@ public class OpArrowItemEntityOLD extends ArrowEntity {
         stack.setCount(1);
         return stack;
     }
+
 
     @Override
     public boolean hasNoGravity() {
@@ -208,8 +209,8 @@ public class OpArrowItemEntityOLD extends ArrowEntity {
             if ("fire".equals(this.featherType)) target.setOnFireFor(10);
 
             float baseDamage = 2.0F;
-            if ("gold".equals(this.stemVariant)) baseDamage += 2.0F;
-            if ("iron".equals(this.stemVariant)) baseDamage += 1.0F;
+            if ("gold".equals(this.stemVariant)) baseDamage += 1.0F;
+            if ("iron".equals(this.stemVariant)) baseDamage += 2.0F;
             if (this.isCritical()) {
                 baseDamage += this.random.nextFloat() * baseDamage * 0.5F + 0.5F;
             }
