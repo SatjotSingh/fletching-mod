@@ -120,6 +120,34 @@ public class OpArrowItemEntity extends ArrowEntity {
 
 
     @Override
+    public void writeCustomDataToNbt(NbtCompound nbt) {
+        super.writeCustomDataToNbt(nbt);
+
+        if(stem != null) {
+            stem.writeNbt(nbt);
+        }
+
+        if(feather != null) {
+            feather.writeNbt(nbt);
+        }
+
+    }
+
+    @Override
+    public void readCustomDataFromNbt(NbtCompound nbt) {
+        super.readCustomDataFromNbt(nbt);
+
+        if(stem != null) {
+            stem.readNbt(nbt);
+        }
+
+        if(feather != null) {
+            feather.readNbt(nbt);
+        }
+
+    }
+
+    @Override
     public void tick() {
         super.tick();
 

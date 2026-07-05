@@ -5,6 +5,7 @@ import net.daplow.daplowfletch.item.custom.OpArrowItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
@@ -36,6 +37,16 @@ public class GoldStem implements ArrowStem {
         float gravity = 0f;
         gravity = 0.03f; // reduce gravity to 30%
         arrow.setVelocity(velocity.x, velocity.y - gravity, velocity.z);
+
+    }
+
+    @Override
+    public void writeNbt(NbtCompound nbt) {
+
+    }
+
+    @Override
+    public void readNbt(NbtCompound nbt) {
 
     }
 

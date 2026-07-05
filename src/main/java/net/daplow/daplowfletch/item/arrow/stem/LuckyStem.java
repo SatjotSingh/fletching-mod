@@ -4,6 +4,7 @@ import net.daplow.daplowfletch.item.custom.ArrowStem;
 import net.daplow.daplowfletch.item.custom.OpArrowItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
@@ -46,6 +47,16 @@ public class LuckyStem implements ArrowStem {
                     0.005
             );
         }
+
+    }
+
+    @Override
+    public void writeNbt(NbtCompound nbt) {
+
+    }
+
+    @Override
+    public void readNbt(NbtCompound nbt) {
 
     }
 

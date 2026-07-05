@@ -2,6 +2,7 @@ package net.daplow.daplowfletch.item.custom;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 
@@ -13,11 +14,11 @@ public interface ArrowFeather {
     void onBlockHit(OpArrowItemEntity arrow,
                     BlockHitResult hit);
 
-    //void writeNbt(NbtCompound nbt);
-
-    //void readNbt(NbtCompound nbt);
-
     void tick(OpArrowItemEntity arrow);
+
+    void writeNbt(NbtCompound nbt);
+
+    void readNbt(NbtCompound nbt);
 
     void onRemove();
 

@@ -5,6 +5,7 @@ import net.daplow.daplowfletch.item.custom.OpArrowItemEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
@@ -31,6 +32,16 @@ public class WarpingArrow implements ArrowFeather {
 
     @Override
     public void tick(OpArrowItemEntity arrow) {
+
+    }
+
+    @Override
+    public void writeNbt(NbtCompound nbt) {
+
+    }
+
+    @Override
+    public void readNbt(NbtCompound nbt) {
 
     }
 

@@ -4,6 +4,7 @@ import net.daplow.daplowfletch.item.custom.ArrowFeather;
 import net.daplow.daplowfletch.item.custom.OpArrowItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.World;
@@ -68,6 +69,16 @@ public class TntFeather implements ArrowFeather {
 
     @Override
     public void tick(OpArrowItemEntity arrow) {
+
+    }
+
+    @Override
+    public void writeNbt(NbtCompound nbt) {
+
+    }
+
+    @Override
+    public void readNbt(NbtCompound nbt) {
 
     }
 
