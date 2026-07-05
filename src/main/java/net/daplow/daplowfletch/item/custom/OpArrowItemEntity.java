@@ -1,6 +1,7 @@
 package net.daplow.daplowfletch.item.custom;
 
 import net.daplow.daplowfletch.other.entity.ModEntities;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EntityType;
@@ -25,6 +26,9 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class OpArrowItemEntity extends ArrowEntity {
 
     private ArrowStem stem;
@@ -33,6 +37,8 @@ public class OpArrowItemEntity extends ArrowEntity {
 
     private ItemStack originalStack;
     private NbtCompound nbtData;
+    private final Map<Enchantment, Integer> enchantments = new HashMap<>();
+
 
     private static final TrackedData<Integer> POTION_COLOR =
             DataTracker.registerData(OpArrowItemEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -54,15 +60,35 @@ public class OpArrowItemEntity extends ArrowEntity {
     public OpArrowItemEntity(EntityType<? extends ArrowEntity> entityType, World world) {
         super(entityType, world);
     }
+    public OpArrowItemEntity(World world, double x, double y, double z, ItemStack stack, ItemStack bowStack) {
+        super(ModEntities.OP_ARROW_ENTITY, world);
+        this.setPosition(x, y, z);
+        this.originalStack = stack.copy();
+        this.originalStack.setCount(1);
+        this.pickupType = PickupPermission.ALLOWED;
+        this.nbtData = stack.getNbt();
+    }
 
-    public OpArrowItemEntity(World world, LivingEntity owner, ItemStack stack) {
-        super((EntityType<? extends ArrowEntity>) ModEntities.OP_ARROW_ENTITY, world);
+    public OpArrowItemEntity(World world, LivingEntity owner, ItemStack stack, ItemStack bowStack) {
+        super(ModEntities.OP_ARROW_ENTITY, world);
         this.setOwner(owner);
         this.setPosition(owner.getX(), owner.getEyeY() - 0.1, owner.getZ());
         this.originalStack = stack.copy();
         this.originalStack.setCount(1);
         this.nbtData = stack.getNbt();
 
+/*
+        Map<Enchantment, Integer> enchants =
+                EnchantmentHelper.get(bow);
+
+        for (Map.Entry<Enchantment, Integer> entry : enchants.entrySet()) {
+            stack.setEnchantment(
+                    entry.getKey(),
+                    entry.getValue() + 1
+            );
+        }
+
+ */
 
     }
 
@@ -160,7 +186,7 @@ public class OpArrowItemEntity extends ArrowEntity {
         if (!this.world.isClient && entityHitResult.getEntity() instanceof LivingEntity target) {
 
             LivingEntity shooter = this.getOwner() instanceof LivingEntity le ? le : null;
-
+/*
             float baseDamage = 2.0F;
         if (this.isCritical()) {
             baseDamage += this.random.nextFloat() * baseDamage * 0.5F + 0.5F;
@@ -183,7 +209,7 @@ public class OpArrowItemEntity extends ArrowEntity {
             }
         }
         target.damage(DamageSource.arrow(this, this.getOwner()), baseDamage);
-
+*/
 
         if (this.nbtData != null && this.nbtData.contains("Potion")) {
             ItemStack potionStack = new ItemStack(Items.POTION);
@@ -212,6 +238,8 @@ public class OpArrowItemEntity extends ArrowEntity {
                 }
             }
         }
+
+
         }
     }
 

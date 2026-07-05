@@ -1,0 +1,14 @@
+{
+  "item" : "minecraft:lapis_lazuli",
+  "effect" : "daplow-fletch:lapis_arrow",
+  "color" : 925596,
+
+  "Data" : {
+    "damage": 1
+  },
+
+  "Info" : {
+    "Name" : "Lapis",
+    "Lore" : "Boost all Bow Enchantemnts by 1"
+  }
+}

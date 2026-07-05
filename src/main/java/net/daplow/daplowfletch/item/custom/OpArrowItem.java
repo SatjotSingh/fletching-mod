@@ -34,12 +34,7 @@ public class OpArrowItem extends ArrowItem {
         super(settings);
     }
 
-    public static void registerStem(String id, Supplier<ArrowStem> factory) {
-        ArrowStemRegistry.register(new Identifier(MOD_ID, id), factory);
-    }
-    public static void registerFeather(String id, Supplier<ArrowFeather> factory) {
-        ArrowFeatherRegistry.register(new Identifier(MOD_ID, id), factory);
-    }
+
 
 
     @Override
@@ -59,7 +54,43 @@ public class OpArrowItem extends ArrowItem {
         if (group != ModItems.DAPLOW_MOB_REVAMP) {
             return;
         }
+        stacks.add(Items.ARROW.getDefaultStack());
         for (StemRecipe stem : StemRecipeManager.getRecipes()) {
+            ItemStack arrow = SpawnOpArrow.getStackfromItem(
+                    "none",
+                    stem.getItem(),
+                    ItemStack.EMPTY.getItem(),
+                    1
+            );
+            stacks.add(arrow);
+        }
+        for (FeatherRecipe feather : FeatherRecipeManager.getRecipes()) {
+            ItemStack arrow = SpawnOpArrow.getStackfromItem(
+                    "none",
+                    ItemStack.EMPTY.getItem(),
+                    feather.getItem(),
+                    1
+            );
+            stacks.add(arrow);
+        }
+
+        for (Potion potion : Registry.POTION) {
+
+            Identifier potionId = Registry.POTION.getId(potion);
+            String potionIdString = potionId.toString();
+
+            if (!potionIdString.equals("minecraft:empty")) {
+                ItemStack arrow = SpawnOpArrow.getStackfromItem(
+                        potionIdString,
+                        ItemStack.EMPTY.getItem(),
+                        ItemStack.EMPTY.getItem(),
+                        1
+                );
+
+                stacks.add(arrow);
+            }
+        }
+            for (StemRecipe stem : StemRecipeManager.getRecipes()) {
 
             for (FeatherRecipe feather : FeatherRecipeManager.getRecipes()) {
 
@@ -67,20 +98,22 @@ public class OpArrowItem extends ArrowItem {
 
                     Identifier potionId = Registry.POTION.getId(potion);
                     String potionIdString = potionId.toString();
+                    if (!potionIdString.equals("minecraft:empty")) {
 
-                    ItemStack arrow = SpawnOpArrow.getStackfromItem(
-                            potionIdString,
-                            stem.getItem(),
-                            feather.getItem(),
-                            1
-                    );
+                        ItemStack arrow = SpawnOpArrow.getStackfromItem(
+                                potionIdString,
+                                stem.getItem(),
+                                feather.getItem(),
+                                1
+                        );
 
-                    stacks.add(arrow);
+                        stacks.add(arrow);
+                    }
                 }
             }
         }
     }
-
+/*
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
@@ -100,7 +133,7 @@ public class OpArrowItem extends ArrowItem {
         super.inventoryTick(stack, world, entity, slot, selected);
 
     }
-
+*/
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         //tooltip.add(Text.literal("Please use: /daplw give op_arrow")
@@ -111,16 +144,9 @@ public class OpArrowItem extends ArrowItem {
 
     @Override
     public ArrowEntity createArrow(World world, ItemStack stack, LivingEntity shooter) {
-        OpArrowItemEntity arrow = new OpArrowItemEntity(world, shooter, stack);
-        if (stack.hasNbt() && stack.getNbt().contains("Potion")) {
-            ItemStack potionStack = new ItemStack(Items.POTION);
-            potionStack.getOrCreateNbt().putString(
-                    "Potion",
-                    stack.getNbt().getString("Potion")
-            );
+        ItemStack bowStack = shooter.getMainHandStack();
+        OpArrowItemEntity arrow = new OpArrowItemEntity(world, shooter, stack, bowStack);
 
-            arrow.setPotionColor(PotionUtil.getColor(potionStack));
-        }
         OpArrowFactory.applyBehavior(arrow, stack);
 
         return arrow;

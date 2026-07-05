@@ -1,0 +1,14 @@
+{
+  "item" : "minecraft:nether_star",
+  "effect" : "daplow-fletch:base_stem",
+  "color" : 16777215,
+
+  "Data" : {
+    "damage": 999
+  },
+
+  "Info" : {
+    "Name" : "BROKEN",
+    "Lore" : "Does 999+ Damage"
+  }
+}

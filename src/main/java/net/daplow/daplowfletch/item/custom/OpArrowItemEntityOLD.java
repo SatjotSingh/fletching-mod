@@ -30,6 +30,7 @@ import net.minecraft.world.explosion.Explosion;
 
 import java.util.List;
 
+@Deprecated
 public class OpArrowItemEntityOLD extends ArrowEntity {
 
     public String potionId = "";

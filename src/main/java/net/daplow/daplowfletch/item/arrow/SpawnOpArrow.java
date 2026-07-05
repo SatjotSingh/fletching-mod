@@ -22,9 +22,16 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 import java.util.Map;
+import java.util.Set;
 
 public class SpawnOpArrow {
 
+    private static final Set<String> INVALID_POTIONS = Set.of(
+            "minecraft:none",
+            "none",
+            "minecraft:empty",
+            "empty"
+    );
 
     public static ItemStack getStack(String potionID, ItemStack stemStack, ItemStack featherStack, int count) {
         ItemStack arrow = new ItemStack(ModItems.OP_ARROW);
@@ -38,7 +45,7 @@ public class SpawnOpArrow {
         String potionName = "";
         java.util.List<String> potionLore = new java.util.ArrayList<>();
 
-        if (!potionID.equalsIgnoreCase("minecraft:none") && !potionID.equalsIgnoreCase("none")) {
+        if (!INVALID_POTIONS.contains(potionID.toLowerCase())) {
 
             Identifier potionIdentifier = Identifier.tryParse(potionID);
 

@@ -1,0 +1,13 @@
+{
+  "item" : "minecraft:emerald",
+  "effect" : "daplow-fletch:lucky_stem",
+  "color" : 3319890,
+
+  "Data" : {
+  },
+
+  "Info" : {
+    "Name" : "Lucky",
+    "Lore" : "Better Loot Drop"
+  }
+}
