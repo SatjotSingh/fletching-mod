@@ -1,13 +1,13 @@
 {
   "item" : "minecraft:obsidian",
   "effect" : "daplow-fletch:obsidian_stem",
-  "color" : 85572,
+  "color" : 1582950,
 
   "Data" : {
   },
 
   "Info" : {
-    "Name" : "Strong",
-    "Lore" : "Strong Against Armor"
+    "Name" : "Breach",
+    "Lore" : "Reduces Effectiveness of Armor"
   }
 }

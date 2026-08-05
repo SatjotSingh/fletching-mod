@@ -30,6 +30,8 @@ public class FletchingScreen extends HandledScreen<FletchingScreenHandler> {
         RenderSystem.setShaderTexture(0, TEXTURE);
         DrawableHelper.drawTexture(matrices, this.x, this.y, 0, 0, backgroundWidth, backgroundHeight, 256, 256);
 
+
+        // --- Potion Bottle Color --- //
         int height = ClientHeight;
         int color = ClientColor;
 
@@ -65,8 +67,6 @@ public class FletchingScreen extends HandledScreen<FletchingScreenHandler> {
     private void drawPlayerInventory(MatrixStack matrices, int x, int y) {
         this.client.getTextureManager().bindTexture(new Identifier("minecraft", "textures/gui/container/inventory.png"));
         DrawableHelper.drawTexture(matrices, x + 8, y + 4, 0, 0, 162, 54, 176, 54);
-
-
     }
 
 
